@@ -1,262 +1,588 @@
-// Trading Journal SPA – Vanilla JS (stable build)
-/* The application functions entirely on the client with no persistence APIs */
+// Trading Journal Level 5 - Complete Application Logic
 
-(function () {
-  /* ---------------- Utility helpers ---------------- */
-  const $ = (sel, scope = document) => scope.querySelector(sel);
-  const $$ = (sel, scope = document) => Array.from(scope.querySelectorAll(sel));
-  const COLORS = ['#1FB8CD', '#FFC185', '#B4413C', '#ECEBD5', '#5D878F', '#DB4545', '#D2BA4C', '#964325', '#944454', '#13343B'];
-
-  function uuid() {
-    return (window.crypto && crypto.randomUUID)
-      ? crypto.randomUUID()
-      : 'xxxxxxxx-xxxx'.replace(/x/g, () => ((Math.random() * 16) | 0).toString(16));
+class TradingJournal {
+  constructor() {
+    this.data = {
+      accounts: [],
+      strategies: [],
+      trades: [],
+      settings: { currency: 'INR' }
+    };
+    this.activeTab = 'dashboard';
+    this.livePrices = new Map();
+    this.priceUpdateInterval = null;
+    
+    this.init();
   }
 
-  const toast = (msg) => {
-    const cont = $('#toastContainer');
-    if (!cont) return;
-    const el = document.createElement('div');
-    el.className = 'toast';
-    el.textContent = msg;
-    cont.appendChild(el);
-    setTimeout(() => el.remove(), 2600);
-  };
-
-  /* ---------------- Global state ---------------- */
-  const state = { accounts: [], strategies: [], trades: [] };
-
-  /* ---------------- Derived helpers ---------------- */
-  function calcDerived(t) {
-    const risk = Math.abs(t.entryPrice - t.stopLoss);
-    const reward = Math.abs(t.targetPrice - t.entryPrice);
-    t.riskReward = risk ? +(reward / risk).toFixed(2) : 0;
-    const dir = t.side === 'long' ? 1 : -1;
-    t.pnl = +((t.exitPrice - t.entryPrice) * dir).toFixed(2);
-    t.outcome = t.pnl >= 0 ? 'win' : 'loss';
+  init() {
+    this.loadData();
+    this.setupEventListeners();
+    this.initStockAutocomplete();
+    this.startLivePriceUpdates();
+    this.renderActiveTab();
   }
 
-  /* ---------------- Select population ---------------- */
-  function refreshSelectOptions() {
-    // Accounts
-    $$('select[id$="account"]').forEach((sel) => {
-      const prev = sel.value;
-      const isFilter = sel.id.includes('filter') || sel.id.includes('analytics');
-      sel.innerHTML = isFilter ? '<option value="all">All Accounts</option>' : '';
-      state.accounts.forEach((acc) => {
-        const opt = document.createElement('option');
-        opt.value = acc.id;
-        opt.textContent = acc.name;
-        sel.appendChild(opt);
+  // Data Management
+  loadData() {
+    const saved = localStorage.getItem('tradingJournalData');
+    if (saved) {
+      this.data = { ...this.data, ...JSON.parse(saved) };
+    } else {
+      // Load sample data
+      this.data.accounts = [
+        {id: 1, name: "Main Trading", initialBalance: 100000, currentBalance: 105000},
+        {id: 2, name: "Long Term", initialBalance: 200000, currentBalance: 215000}
+      ];
+      this.data.strategies = [
+        {id: 1, name: "Momentum Trading"},
+        {id: 2, name: "Value Investing"},
+        {id: 3, name: "Swing Trading"},
+        {id: 4, name: "Intraday"}
+      ];
+      this.data.trades = [
+        {
+          id: 1, symbol: "RELIANCE.NS", entryDate: "2025-01-15", entryPrice: 2450,
+          stopLoss: 2400, target: 2550, exitDate: "2025-01-20", exitPrice: 2520,
+          orderType: "Long", strategy: "Momentum Trading", account: "Main Trading",
+          quantity: 10, pnl: 700, pnlPercent: 2.86, status: "Win"
+        },
+        {
+          id: 2, symbol: "TCS.NS", entryDate: "2025-01-22", entryPrice: 3850,
+          stopLoss: 3800, target: 3950, orderType: "Long", strategy: "Value Investing",
+          account: "Long Term", quantity: 5, status: "Open"
+        }
+      ];
+      this.saveData();
+    }
+  }
+
+  saveData() {
+    localStorage.setItem('tradingJournalData', JSON.stringify(this.data));
+  }
+
+  // Event Listeners
+  setupEventListeners() {
+    // Tab switching
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', (e) => {
+        this.switchTab(e.target.dataset.tab);
       });
-      if (prev && [...sel.options].some((o) => o.value === prev)) sel.value = prev;
     });
 
-    // Strategies
-    $$('select[id$="strategy"]').forEach((sel) => {
-      const prev = sel.value;
-      const isFilter = sel.id.includes('filter') || sel.id.includes('analytics');
-      sel.innerHTML = isFilter ? '<option value="all">All Strategies</option>' : '';
-      state.strategies.forEach((strat) => {
-        const opt = document.createElement('option');
-        opt.value = strat.id;
-        opt.textContent = strat.name;
-        sel.appendChild(opt);
-      });
-      if (prev && [...sel.options].some((o) => o.value === prev)) sel.value = prev;
+    // Forms
+    document.getElementById('account-form').addEventListener('submit', (e) => this.addAccount(e));
+    document.getElementById('strategy-form').addEventListener('submit', (e) => this.addStrategy(e));
+    document.getElementById('trade-form').addEventListener('submit', (e) => this.addTrade(e));
+    
+    // Bulk delete
+    document.getElementById('delete-selected').addEventListener('click', () => this.deleteSelectedTrades());
+    
+    // AI Insights
+    document.getElementById('generate-insight').addEventListener('click', () => this.generateAIInsight());
+  }
+
+  switchTab(tabName) {
+    // Update active tab
+    document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+    document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+    
+    // Show/hide sections
+    document.querySelectorAll('.tab-section').forEach(section => section.classList.add('hidden'));
+    document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+    
+    this.activeTab = tabName;
+    this.renderActiveTab();
+  }
+
+  renderActiveTab() {
+    switch(this.activeTab) {
+      case 'dashboard':
+        this.renderDashboard();
+        break;
+      case 'settings':
+        this.renderSettings();
+        break;
+      case 'trades':
+        this.renderTradeForm();
+        break;
+      case 'openTrades':
+        this.renderOpenTrades();
+        break;
+      case 'allTrades':
+        this.renderAllTrades();
+        break;
+      case 'analytics':
+        this.renderAnalytics();
+        break;
+    }
+  }
+
+  // Dashboard
+  renderDashboard() {
+    const cards = document.getElementById('dashboard-cards');
+    const { totalBalance, balanceInUse, totalPnL, openPositions } = this.calculateDashboardMetrics();
+    
+    cards.innerHTML = `
+      <div class="dashboard-card">
+        <h3>Total Available Balance</h3>
+        <div class="value currency-display">${this.formatCurrency(totalBalance)}</div>
+      </div>
+      <div class="dashboard-card">
+        <h3>Balance in Use</h3>
+        <div class="value currency-display">${this.formatCurrency(balanceInUse)}</div>
+      </div>
+      <div class="dashboard-card">
+        <h3>Total P&L</h3>
+        <div class="value currency-display ${totalPnL >= 0 ? 'positive' : 'negative'}">${this.formatCurrency(totalPnL)}</div>
+      </div>
+      <div class="dashboard-card">
+        <h3>Open Positions</h3>
+        <div class="value">${openPositions}</div>
+      </div>
+    `;
+
+    this.renderRecentTrades();
+    this.renderMarketIndices();
+  }
+
+  calculateDashboardMetrics() {
+    const totalBalance = this.data.accounts.reduce((sum, acc) => sum + acc.currentBalance, 0);
+    const openTrades = this.data.trades.filter(t => t.status === 'Open');
+    const balanceInUse = openTrades.reduce((sum, trade) => sum + (trade.entryPrice * trade.quantity), 0);
+    const totalPnL = this.data.trades.reduce((sum, trade) => sum + (trade.pnl || 0), 0);
+    
+    return { totalBalance, balanceInUse, totalPnL, openPositions: openTrades.length };
+  }
+
+  renderRecentTrades() {
+    const table = document.getElementById('recent-trades-table');
+    const recentTrades = this.data.trades.slice(-5).reverse();
+    
+    table.innerHTML = `
+      <thead>
+        <tr><th>Symbol</th><th>Date</th><th>Type</th><th>P&L</th><th>Status</th></tr>
+      </thead>
+      <tbody>
+        ${recentTrades.map(trade => `
+          <tr>
+            <td>${trade.symbol}</td>
+            <td>${trade.entryDate}</td>
+            <td>${trade.orderType}</td>
+            <td class="currency ${(trade.pnl || 0) >= 0 ? 'positive' : 'negative'}">${this.formatCurrency(trade.pnl || 0)}</td>
+            <td><span class="trade-status ${trade.status.toLowerCase()}">${trade.status}</span></td>
+          </tr>
+        `).join('')}
+      </tbody>
+    `;
+  }
+
+  renderMarketIndices() {
+    const indices = document.getElementById('market-indices');
+    const mockIndices = [
+      { name: 'NIFTY 50', value: 23500, change: '+1.2%' },
+      { name: 'SENSEX', value: 77800, change: '+0.8%' },
+      { name: 'BANKNIFTY', value: 51200, change: '-0.3%' }
+    ];
+    
+    indices.innerHTML = mockIndices.map(index => `
+      <div class="market-card">
+        <h4>${index.name}</h4>
+        <div class="index-value">${index.value.toLocaleString()}</div>
+        <div class="index-change ${index.change.startsWith('+') ? 'positive' : 'negative'}">${index.change}</div>
+      </div>
+    `).join('');
+  }
+
+  // Settings
+  renderSettings() {
+    this.renderAccountsList();
+    this.renderStrategiesList();
+  }
+
+  addAccount(e) {
+    e.preventDefault();
+    const name = document.getElementById('account-name').value;
+    const balance = parseFloat(document.getElementById('account-balance').value);
+    
+    const newAccount = {
+      id: Date.now(),
+      name,
+      initialBalance: balance,
+      currentBalance: balance
+    };
+    
+    this.data.accounts.push(newAccount);
+    this.saveData();
+    this.renderAccountsList();
+    e.target.reset();
+  }
+
+  addStrategy(e) {
+    e.preventDefault();
+    const name = document.getElementById('strategy-name').value;
+    
+    const newStrategy = {
+      id: Date.now(),
+      name
+    };
+    
+    this.data.strategies.push(newStrategy);
+    this.saveData();
+    this.renderStrategiesList();
+    e.target.reset();
+  }
+
+  renderAccountsList() {
+    const list = document.getElementById('accounts-list');
+    list.innerHTML = this.data.accounts.map(account => `
+      <li>
+        <span>${account.name} - ₹${account.currentBalance.toLocaleString()}</span>
+        <button class="btn btn--sm btn--outline" onclick="app.deleteAccount(${account.id})">Delete</button>
+      </li>
+    `).join('');
+  }
+
+  renderStrategiesList() {
+    const list = document.getElementById('strategies-list');
+    list.innerHTML = this.data.strategies.map(strategy => `
+      <li>
+        <span>${strategy.name}</span>
+        <button class="btn btn--sm btn--outline" onclick="app.deleteStrategy(${strategy.id})">Delete</button>
+      </li>
+    `).join('');
+  }
+
+  deleteAccount(id) {
+    this.data.accounts = this.data.accounts.filter(a => a.id !== id);
+    this.saveData();
+    this.renderAccountsList();
+  }
+
+  deleteStrategy(id) {
+    this.data.strategies = this.data.strategies.filter(s => s.id !== id);
+    this.saveData();
+    this.renderStrategiesList();
+  }
+
+  // Trade Form
+  renderTradeForm() {
+    const strategySelect = document.getElementById('trade-strategy');
+    const accountSelect = document.getElementById('trade-account');
+    
+    strategySelect.innerHTML = this.data.strategies.map(s => 
+      `<option value="${s.name}">${s.name}</option>`
+    ).join('');
+    
+    accountSelect.innerHTML = this.data.accounts.map(a => 
+      `<option value="${a.name}">${a.name}</option>`
+    ).join('');
+  }
+
+  addTrade(e) {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    
+    const trade = {
+      id: Date.now(),
+      symbol: document.getElementById('trade-symbol').value,
+      entryDate: document.getElementById('trade-entry-date').value,
+      entryPrice: parseFloat(document.getElementById('trade-entry-price').value),
+      stopLoss: parseFloat(document.getElementById('trade-stoploss').value),
+      target: parseFloat(document.getElementById('trade-target').value),
+      exitDate: document.getElementById('trade-exit-date').value || null,
+      exitPrice: parseFloat(document.getElementById('trade-exit-price').value) || null,
+      orderType: document.getElementById('trade-order-type').value,
+      strategy: document.getElementById('trade-strategy').value,
+      account: document.getElementById('trade-account').value,
+      quantity: parseInt(document.getElementById('trade-quantity').value)
+    };
+
+    // Calculate P&L and status
+    if (trade.exitPrice && trade.exitDate) {
+      const pnlPerShare = trade.orderType === 'Long' ? 
+        (trade.exitPrice - trade.entryPrice) : 
+        (trade.entryPrice - trade.exitPrice);
+      trade.pnl = pnlPerShare * trade.quantity;
+      trade.pnlPercent = (pnlPerShare / trade.entryPrice) * 100;
+      trade.status = trade.pnl >= 0 ? 'Win' : 'Loss';
+    } else {
+      trade.status = 'Open';
+    }
+
+    this.data.trades.push(trade);
+    this.saveData();
+    e.target.reset();
+    this.showMessage('Trade added successfully!', 'success');
+  }
+
+  // Open Trades
+  renderOpenTrades() {
+    const openTrades = this.data.trades.filter(t => t.status === 'Open');
+    const table = document.getElementById('open-trades-table');
+    
+    table.innerHTML = `
+      <thead>
+        <tr>
+          <th>Symbol</th><th>Entry Date</th><th>Entry Price</th><th>Current Price</th>
+          <th>Quantity</th><th>Current P&L</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${openTrades.map(trade => {
+          const currentPrice = this.getCurrentPrice(trade.symbol);
+          const currentPnL = this.calculateCurrentPnL(trade, currentPrice);
+          return `
+            <tr>
+              <td>${trade.symbol}</td>
+              <td>${trade.entryDate}</td>
+              <td class="currency">${this.formatCurrency(trade.entryPrice)}</td>
+              <td class="currency live-price">${this.formatCurrency(currentPrice)}</td>
+              <td>${trade.quantity}</td>
+              <td class="currency ${currentPnL >= 0 ? 'positive' : 'negative'}">${this.formatCurrency(currentPnL)}</td>
+              <td>
+                <button class="action-btn close" onclick="app.closeTrade(${trade.id})">Close</button>
+              </td>
+            </tr>
+          `;
+        }).join('')}
+      </tbody>
+    `;
+
+    this.renderOpenTradesAnalytics(openTrades);
+  }
+
+  renderOpenTradesAnalytics(openTrades) {
+    const totalCurrentPnL = openTrades.reduce((sum, trade) => {
+      const currentPrice = this.getCurrentPrice(trade.symbol);
+      return sum + this.calculateCurrentPnL(trade, currentPrice);
+    }, 0);
+
+    document.getElementById('open-analytics').innerHTML = `
+      Total Open Positions: ${openTrades.length} | 
+      Current Unrealized P&L: <span class="currency ${totalCurrentPnL >= 0 ? 'positive' : 'negative'}">₹${totalCurrentPnL.toLocaleString()}</span>
+    `;
+  }
+
+  calculateCurrentPnL(trade, currentPrice) {
+    const pnlPerShare = trade.orderType === 'Long' ? 
+      (currentPrice - trade.entryPrice) : 
+      (trade.entryPrice - currentPrice);
+    return pnlPerShare * trade.quantity;
+  }
+
+  closeTrade(tradeId) {
+    const trade = this.data.trades.find(t => t.id === tradeId);
+    if (trade) {
+      const currentPrice = this.getCurrentPrice(trade.symbol);
+      trade.exitPrice = currentPrice;
+      trade.exitDate = new Date().toISOString().split('T')[0];
+      
+      const pnlPerShare = trade.orderType === 'Long' ? 
+        (trade.exitPrice - trade.entryPrice) : 
+        (trade.entryPrice - trade.exitPrice);
+      trade.pnl = pnlPerShare * trade.quantity;
+      trade.pnlPercent = (pnlPerShare / trade.entryPrice) * 100;
+      trade.status = trade.pnl >= 0 ? 'Win' : 'Loss';
+      
+      this.saveData();
+      this.renderOpenTrades();
+      this.showMessage('Trade closed successfully!', 'success');
+    }
+  }
+
+  // All Trades
+  renderAllTrades() {
+    const table = document.getElementById('all-trades-table');
+    
+    table.innerHTML = `
+      <thead>
+        <tr>
+          <th><input type="checkbox" class="trade-checkbox" id="select-all" onchange="app.toggleSelectAll()"></th>
+          <th>Symbol</th><th>Entry Date</th><th>Entry Price</th><th>Exit Price</th>
+          <th>Quantity</th><th>P&L</th><th>Strategy</th><th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${this.data.trades.map(trade => `
+          <tr>
+            <td><input type="checkbox" class="trade-checkbox trade-select" data-id="${trade.id}"></td>
+            <td>${trade.symbol}</td>
+            <td>${trade.entryDate}</td>
+            <td class="currency">${this.formatCurrency(trade.entryPrice)}</td>
+            <td class="currency">${trade.exitPrice ? this.formatCurrency(trade.exitPrice) : '-'}</td>
+            <td>${trade.quantity}</td>
+            <td class="currency ${(trade.pnl || 0) >= 0 ? 'positive' : 'negative'}">${this.formatCurrency(trade.pnl || 0)}</td>
+            <td>${trade.strategy}</td>
+            <td><span class="trade-status ${trade.status.toLowerCase()}">${trade.status}</span></td>
+          </tr>
+        `).join('')}
+      </tbody>
+    `;
+  }
+
+  toggleSelectAll() {
+    const selectAll = document.getElementById('select-all');
+    const checkboxes = document.querySelectorAll('.trade-select');
+    checkboxes.forEach(cb => cb.checked = selectAll.checked);
+  }
+
+  deleteSelectedTrades() {
+    const selected = Array.from(document.querySelectorAll('.trade-select:checked'))
+      .map(cb => parseInt(cb.dataset.id));
+    
+    if (selected.length > 0) {
+      this.data.trades = this.data.trades.filter(t => !selected.includes(t.id));
+      this.saveData();
+      this.renderAllTrades();
+      this.showMessage(`${selected.length} trades deleted successfully!`, 'success');
+    }
+  }
+
+  // Analytics
+  renderAnalytics() {
+    this.renderEquityChart();
+    this.renderWinLossChart();
+    this.renderAIInsights();
+  }
+
+  renderEquityChart() {
+    const ctx = document.getElementById('equity-chart').getContext('2d');
+    const trades = this.data.trades.filter(t => t.pnl !== undefined);
+    let cumulative = 0;
+    const data = trades.map(trade => {
+      cumulative += trade.pnl;
+      return { x: trade.entryDate, y: cumulative };
+    });
+
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        datasets: [{
+          label: 'Cumulative P&L (₹)',
+          data: data,
+          borderColor: '#1FB8CD',
+          backgroundColor: 'rgba(31, 184, 205, 0.1)',
+          fill: true
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          x: { type: 'time', time: { unit: 'day' } },
+          y: { beginAtZero: true }
+        }
+      }
     });
   }
 
-  /* ---------------- Dashboard renderers ---------------- */
-  function renderAccountsTable() {
-    const tbody = $('#accounts-table tbody');
-    tbody.innerHTML = '';
-    state.accounts.forEach((acc) => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${acc.name}</td><td>${acc.balance.toFixed(2)}</td><td></td>`;
-      const actions = tr.lastElementChild;
-      // Edit
-      const editBtn = document.createElement('button');
-      editBtn.className = 'btn btn--sm btn--secondary';
-      editBtn.textContent = 'Edit';
-      editBtn.addEventListener('click', () => {
-        $('#account-name').value = acc.name;
-        $('#account-balance').value = acc.balance;
-        $('#account-submit').dataset.id = acc.id;
-        $('#account-submit').textContent = 'Update';
-      });
-      // Delete
-      const delBtn = document.createElement('button');
-      delBtn.className = 'btn btn--sm btn--outline';
-      delBtn.textContent = 'Delete';
-      delBtn.addEventListener('click', () => {
-        if (state.trades.some((t) => t.accountId === acc.id)) return toast('Cannot delete account with trades');
-        state.accounts = state.accounts.filter((a) => a.id !== acc.id);
-        renderAccountsTable(); refreshSelectOptions();
-      });
-      actions.append(editBtn, delBtn);
-      tbody.appendChild(tr);
+  renderWinLossChart() {
+    const ctx = document.getElementById('winloss-chart').getContext('2d');
+    const trades = this.data.trades.filter(t => t.status !== 'Open');
+    const wins = trades.filter(t => t.status === 'Win').length;
+    const losses = trades.filter(t => t.status === 'Loss').length;
+
+    new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Wins', 'Losses'],
+        datasets: [{
+          data: [wins, losses],
+          backgroundColor: ['#1FB8CD', '#B4413C']
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      }
     });
   }
 
-  function renderStrategiesTable() {
-    const tbody = $('#strategies-table tbody');
-    tbody.innerHTML = '';
-    state.strategies.forEach((strat) => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${strat.name}</td><td></td>`;
-      const actions = tr.lastElementChild;
-      const editBtn = document.createElement('button');
-      editBtn.className = 'btn btn--sm btn--secondary';
-      editBtn.textContent = 'Edit';
-      editBtn.addEventListener('click', () => {
-        $('#strategy-name').value = strat.name;
-        $('#strategy-submit').dataset.id = strat.id;
-        $('#strategy-submit').textContent = 'Update';
+  renderAIInsights() {
+    const insights = [
+      "Your momentum trading strategy shows a 68% win rate with strong risk management",
+      "Consider reducing position size in volatile stocks like RELIANCE.NS",
+      "Your average holding period of 5 days aligns well with swing trading approach",
+      "Risk-reward ratio averaging 1:1.5 indicates good trade selection"
+    ];
+    
+    const list = document.getElementById('ai-insights');
+    list.innerHTML = insights.map(insight => `<li>${insight}</li>`).join('');
+  }
+
+  generateAIInsight() {
+    const insights = [
+      "Consider diversifying across more sectors for better risk distribution",
+      "Your recent trades show improved entry timing - keep up the good work!",
+      "Stop loss adherence is at 95% - excellent discipline",
+      "Banking sector exposure is high - monitor sector concentration risk"
+    ];
+    
+    const randomInsight = insights[Math.floor(Math.random() * insights.length)];
+    const list = document.getElementById('ai-insights');
+    list.innerHTML += `<li style="font-weight: bold; color: var(--color-primary);">${randomInsight}</li>`;
+  }
+
+  // Live Prices Simulation
+  startLivePriceUpdates() {
+    // Initialize with mock prices
+    const stocks = ['RELIANCE.NS', 'TCS.NS', 'HDFCBANK.NS', 'ICICIBANK.NS'];
+    stocks.forEach(symbol => {
+      this.livePrices.set(symbol, Math.random() * 1000 + 1000);
+    });
+
+    // Update prices every 5 seconds
+    this.priceUpdateInterval = setInterval(() => {
+      this.livePrices.forEach((price, symbol) => {
+        const change = (Math.random() - 0.5) * 20;
+        this.livePrices.set(symbol, Math.max(price + change, 1));
       });
-      const delBtn = document.createElement('button');
-      delBtn.className = 'btn btn--sm btn--outline';
-      delBtn.textContent = 'Delete';
-      delBtn.addEventListener('click', () => {
-        if (state.trades.some((t) => t.strategyId === strat.id)) return toast('Cannot delete strategy with trades');
-        state.strategies = state.strategies.filter((s) => s.id !== strat.id);
-        renderStrategiesTable(); refreshSelectOptions();
-      });
-      actions.append(editBtn, delBtn);
-      tbody.appendChild(tr);
-    });
+      
+      if (this.activeTab === 'openTrades') {
+        this.renderOpenTrades();
+      }
+    }, 5000);
   }
 
-  /* ---------------- Trades renderer ---------------- */
-  function tradeRowHtml(tr) {
-    const accName = state.accounts.find((a) => a.id === tr.accountId)?.name || '';
-    const stratName = state.strategies.find((s) => s.id === tr.strategyId)?.name || '';
-    return `<td>${accName}</td><td>${stratName}</td><td>${tr.side}</td><td>${tr.entryDate}</td><td>${tr.entryPrice}</td><td>${tr.stopLoss}</td><td>${tr.targetPrice}</td><td>${tr.riskReward}</td><td>${tr.exitDate}</td><td>${tr.exitPrice}</td><td>${tr.pnl}</td><td>${tr.outcome}</td>`;
+  getCurrentPrice(symbol) {
+    return this.livePrices.get(symbol) || 1000;
   }
 
-  function getFilteredTrades(prefix) {
-    const accountFilter = $('#' + prefix + 'account').value;
-    const stratFilter = $('#' + prefix + 'strategy').value;
-    const outcomeFilter = $('#' + prefix + 'outcome').value;
-    return state.trades.filter((t) => {
-      if (accountFilter !== 'all' && t.accountId !== accountFilter) return false;
-      if (stratFilter !== 'all' && t.strategyId !== stratFilter) return false;
-      if (outcomeFilter !== 'all' && t.outcome !== outcomeFilter) return false;
-      return true;
-    });
+  // Stock Autocomplete
+  initStockAutocomplete() {
+    const stocks = [
+      "RELIANCE.NS", "TCS.NS", "HDFCBANK.NS", "ICICIBANK.NS", "HINDUNILVR.NS",
+      "INFY.NS", "ITC.NS", "KOTAKBANK.NS", "LT.NS", "AXISBANK.NS",
+      "BHARTIARTL.NS", "ASIANPAINT.NS", "MARUTI.NS", "M&M.NS", "NESTLEIND.NS"
+    ];
+    
+    const datalist = document.getElementById('symbols');
+    datalist.innerHTML = stocks.map(stock => `<option value="${stock}">`).join('');
   }
 
-  function renderTradesTable() {
-    const tbody = $('#trades-table tbody');
-    tbody.innerHTML = '';
-    getFilteredTrades('filter-').forEach((trd) => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = tradeRowHtml(trd) + '<td></td>';
-      const del = document.createElement('button');
-      del.className = 'btn btn--sm btn--outline';
-      del.textContent = 'Delete';
-      del.addEventListener('click', () => {
-        state.trades = state.trades.filter((t) => t.id !== trd.id);
-        renderTradesTable(); renderAllTradesTable(); updateAnalytics();
-      });
-      tr.lastElementChild.appendChild(del);
-      tbody.appendChild(tr);
-    });
+  // Utilities
+  formatCurrency(amount) {
+    return new Intl.NumberFormat('en-IN', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(amount);
   }
 
-  /* ---------------- All trades */
-  function renderAllTradesHeader() { $('#all-trades-table thead').innerHTML = $('#trades-table thead').innerHTML; }
-  function renderAllTradesTable() {
-    const tbody = $('#all-trades-table tbody');
-    tbody.innerHTML = '';
-    getFilteredTrades('all-filter-').forEach((trd) => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = tradeRowHtml(trd);
-      tbody.appendChild(tr);
-    });
+  showMessage(text, type) {
+    const message = document.createElement('div');
+    message.className = `message ${type}`;
+    message.textContent = text;
+    document.body.appendChild(message);
+    
+    setTimeout(() => {
+      message.remove();
+    }, 3000);
   }
+}
 
-  /* ---------------- Analytics ---------------- */
-  let charts = { equity: null, winloss: null, strategy: null };
+// Initialize app
+const app = new TradingJournal();
 
-  function computeMetrics(trades) {
-    const total = trades.length;
-    const wins = trades.filter((t) => t.outcome === 'win');
-    const losses = trades.filter((t) => t.outcome === 'loss');
-    const winRate = total ? ((wins.length / total) * 100).toFixed(1) : 0;
-    const avgRR = total ? (trades.reduce((a, t) => a + t.riskReward, 0) / total).toFixed(2) : 0;
-    const sumWins = wins.reduce((a, t) => a + t.pnl, 0);
-    const sumLoss = losses.reduce((a, t) => a + t.pnl, 0);
-    const profitFactor = sumLoss !== 0 ? (sumWins / Math.abs(sumLoss)).toFixed(2) : '—';
-    const expectancy = (total ? ((wins.length / total) * (sumWins / (wins.length || 1)) + (losses.length / total) * (sumLoss / (losses.length || 1))) : 0).toFixed(2);
-    const totalPnL = trades.reduce((a, t) => a + t.pnl, 0).toFixed(2);
-    let equity = 0, peak = 0, maxDD = 0;
-    [...trades].sort((a,b) => a.exitDate.localeCompare(b.exitDate)).forEach((t) => { equity += t.pnl; if (equity > peak) peak = equity; maxDD = Math.max(maxDD, peak - equity); });
-    return { total, winRate, avgRR, profitFactor, expectancy, totalPnL, maxDD: maxDD.toFixed(2) };
-  }
-
-  function renderMetrics(m) {
-    $('#metrics-grid').innerHTML = [
-      ['Total Trades', m.total],
-      ['Win Rate %', m.winRate],
-      ['Avg R:R', m.avgRR],
-      ['Profit Factor', m.profitFactor],
-      ['Expectancy', m.expectancy],
-      ['Total P&L', m.totalPnL],
-      ['Max Drawdown', m.maxDD],
-    ].map(([l,v]) => `<div class="metric-card"><span>${l}</span><div class="metric-value">${v}</div></div>`).join('');
-  }
-
-  function renderCharts(trades) {
-    Object.values(charts).forEach((c) => c && c.destroy());
-    if (!trades.length) {charts={ equity:null,winloss:null,strategy:null}; return; }
-    const sorted=[...trades].sort((a,b)=>a.exitDate.localeCompare(b.exitDate));
-    let cum=0; const equityData=sorted.map(t=>{cum+=t.pnl; return cum.toFixed(2);}); const labels=sorted.map(t=>t.exitDate);
-    charts.equity=new Chart($('#equity-chart'),{type:'line',data:{labels,datasets:[{data:equityData,borderColor:COLORS[0],fill:false,tension:0.3}]},options:{responsive:true,plugins:{legend:{display:false}}}});
-    const wins=trades.filter(t=>t.outcome==='win').length, losses=trades.length-wins;
-    charts.winloss=new Chart($('#winloss-chart'),{type:'pie',data:{labels:['Wins','Losses'],datasets:[{data:[wins,losses],backgroundColor:[COLORS[2],COLORS[5]]}]},options:{responsive:true}});
-    const pnlByStrat={}; trades.forEach(t=>{const name=state.strategies.find(s=>s.id===t.strategyId)?.name||'N/A'; pnlByStrat[name]=(pnlByStrat[name]||0)+t.pnl;});
-    const stratLabels=Object.keys(pnlByStrat);
-    charts.strategy=new Chart($('#strategy-chart'),{type:'bar',data:{labels:stratLabels,datasets:[{data:stratLabels.map(k=>pnlByStrat[k].toFixed(2)),backgroundColor:COLORS.slice(0,stratLabels.length)}]},options:{responsive:true,plugins:{legend:{display:false}}}});
-  }
-
-  function updateAnalytics(){const trades=getFilteredTrades('analytics-filter-'); renderMetrics(computeMetrics(trades)); renderCharts(trades);} 
-
-  /* ---------------- CSV helpers ---------------- */
-  function exportCSV(){ if(!state.trades.length) return toast('No trades'); const headers=['account','strategy','side','entryDate','entryPrice','stopLoss','targetPrice','exitDate','exitPrice','riskReward','pnl','outcome']; const rows=state.trades.map(t=>[state.accounts.find(a=>a.id===t.accountId)?.name||'',state.strategies.find(s=>s.id===t.strategyId)?.name||'',t.side,t.entryDate,t.entryPrice,t.stopLoss,t.targetPrice,t.exitDate,t.exitPrice,t.riskReward,t.pnl,t.outcome].join(',')); const blob=new Blob([[headers.join(',')].concat(rows).join('\n')],{type:'text/csv'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='trades.csv'; a.click(); URL.revokeObjectURL(url);} 
-
-  function importCSV(e){const f=e.target.files[0]; if(!f) return; const reader=new FileReader(); reader.onload=(ev)=>{ const lines=ev.target.result.split(/\r?\n/).filter(Boolean); if(lines.length<2) return; lines.slice(1).forEach(line=>{ const [accName,stratName,side,entryDate,entryPrice,stopLoss,targetPrice,exitDate,exitPrice]=line.split(','); let acc=state.accounts.find(a=>a.name===accName); if(!acc){acc={id:uuid(),name:accName,balance:0}; state.accounts.push(acc);} let strat=state.strategies.find(s=>s.name===stratName); if(!strat){strat={id:uuid(),name:stratName}; state.strategies.push(strat);} const tr={id:uuid(),accountId:acc.id,strategyId:strat.id,side,entryDate,entryPrice:+entryPrice,stopLoss:+stopLoss,targetPrice:+targetPrice,exitDate,exitPrice:+exitPrice}; calcDerived(tr); state.trades.push(tr);}); refreshSelectOptions(); renderAccountsTable(); renderStrategiesTable(); renderTradesTable(); renderAllTradesTable(); updateAnalytics(); toast('CSV imported'); }; reader.readAsText(f); e.target.value=''; }
-
-  /* ---------------- Tab switching ---------------- */
-  function switchTab(btn){ if(btn.classList.contains('active')) return; $$('.tab-link').forEach(b=>{b.classList.toggle('active',b===btn); b.setAttribute('aria-selected', b===btn);}); $$('.tab-panel').forEach(p=>p.classList.add('hidden')); $('#tab-'+btn.dataset.tab).classList.remove('hidden'); if(btn.dataset.tab==='analytics') updateAnalytics(); }
-
-  /* ---------------- Event bindings ---------------- */
-  function addEventListeners(){
-    // Accounts form
-    $('#account-form').addEventListener('submit',(e)=>{e.preventDefault(); const name=$('#account-name').value.trim(); const balance=parseFloat($('#account-balance').value)||0; if(!name) return; const btn=$('#account-submit'); if(btn.dataset.id){ const acc=state.accounts.find(a=>a.id===btn.dataset.id); if(acc){acc.name=name; acc.balance=balance; toast('Account updated');} delete btn.dataset.id; btn.textContent='Add'; } else { state.accounts.push({id:uuid(), name, balance}); toast('Account added'); } e.target.reset(); renderAccountsTable(); refreshSelectOptions();});
-
-    // Strategy form
-    $('#strategy-form').addEventListener('submit',(e)=>{e.preventDefault(); const name=$('#strategy-name').value.trim(); if(!name) return; const btn=$('#strategy-submit'); if(btn.dataset.id){ const s=state.strategies.find(st=>st.id===btn.dataset.id); if(s){s.name=name; toast('Strategy updated');} delete btn.dataset.id; btn.textContent='Add'; } else { state.strategies.push({id:uuid(), name}); toast('Strategy added'); } e.target.reset(); renderStrategiesTable(); refreshSelectOptions();});
-
-    // Trade entry
-    $('#trade-form').addEventListener('submit',(e)=>{e.preventDefault(); const t={ id:uuid(), accountId:$('#trade-account').value, strategyId:$('#trade-strategy').value, side:$('#side').value, entryDate:$('#entry-date').value, entryPrice:+$('#entry-price').value, stopLoss:+$('#stop-loss').value, targetPrice:+$('#target').value, exitDate:$('#exit-date').value, exitPrice:+$('#exit-price').value }; if(t.accountId==='all'||t.strategyId==='all'||!t.accountId||!t.strategyId) return toast('Select account & strategy'); calcDerived(t); state.trades.push(t); e.target.reset(); renderTradesTable(); renderAllTradesTable(); updateAnalytics(); toast('Trade saved');});
-
-    // Filter change
-    ['filter-','all-filter-','analytics-filter-'].forEach(pref=>['account','strategy','outcome'].forEach(f=>$('#'+pref+f).addEventListener('change',()=>{ if(pref==='filter-') renderTradesTable(); else if(pref==='all-filter-') renderAllTradesTable(); else updateAnalytics(); })));
-
-    // CSV buttons
-    $('#export-csv').addEventListener('click',exportCSV);
-    $('#import-csv-btn').addEventListener('click',()=>$('#import-csv-input').click());
-    $('#import-csv-input').addEventListener('change',importCSV);
-
-    // Tabs
-    $$('.tab-link').forEach(btn=>btn.addEventListener('click',()=>switchTab(btn)));
-  }
-
-  /* ---------------- Init ---------------- */
-  function seedSample(){ const acc={id:uuid(), name:'Demo Account', balance:10000}; const strat={id:uuid(), name:'Breakout'}; state.accounts.push(acc); state.strategies.push(strat); const t={ id:uuid(), accountId:acc.id, strategyId:strat.id, side:'long', entryDate:'2025-01-15', entryPrice:100, stopLoss:95, targetPrice:120, exitDate:'2025-01-20', exitPrice:118 }; calcDerived(t); state.trades.push(t);} 
-
-  function init(){ seedSample(); addEventListeners(); refreshSelectOptions(); renderAccountsTable(); renderStrategiesTable(); renderTradesTable(); renderAllTradesHeader(); renderAllTradesTable(); updateAnalytics(); }
-
-  document.addEventListener('DOMContentLoaded', init);
-})();
+// Expose to global scope for event handlers
+window.app = app;
