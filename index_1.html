@@ -3,316 +3,442 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trading Journal Pro - Analytics Fixed</title>
+    <title>Trading Journal Pro - Advanced Analytics Platform</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <header class="header">
-        <div class="container">
-            <h1>Trading Journal Pro</h1>
-            <p class="subtitle">Professional NSE Trading Analytics Platform</p>
-        </div>
-    </header>
+    <div class="app-container">
+        <!-- Navigation Sidebar -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-chart-line logo-icon"></i>
+                    <span class="logo-text">Trading Journal Pro</span>
+                </div>
+            </div>
+            
+            <div class="nav-menu">
+                <div class="nav-item active" data-tab="dashboard">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                    <div class="nav-glow"></div>
+                </div>
+                <div class="nav-item" data-tab="settings">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                    <div class="nav-glow"></div>
+                </div>
+                <div class="nav-item" data-tab="trades">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Add Trade</span>
+                    <div class="nav-glow"></div>
+                </div>
+                <div class="nav-item" data-tab="open-trades">
+                    <i class="fas fa-eye"></i>
+                    <span>Open Trades</span>
+                    <div class="nav-glow"></div>
+                </div>
+                <div class="nav-item" data-tab="all-trades">
+                    <i class="fas fa-list"></i>
+                    <span>All Trades</span>
+                    <div class="nav-glow"></div>
+                </div>
+                <div class="nav-item" data-tab="analytics">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Analytics</span>
+                    <div class="nav-glow"></div>
+                </div>
+                <div class="nav-item" data-tab="news">
+                    <i class="fas fa-newspaper"></i>
+                    <span>News & AI</span>
+                    <div class="nav-glow"></div>
+                </div>
+            </div>
+        </nav>
 
-    <nav class="nav-tabs">
-        <div class="container">
-            <ul class="tabs">
-                <li class="tab active" data-tab="dashboard">📊 Dashboard</li>
-                <li class="tab" data-tab="settings">⚙️ Settings</li>
-                <li class="tab" data-tab="trades">📈 Add Trade</li>
-                <li class="tab" data-tab="openTrades">🔄 Open Trades</li>
-                <li class="tab" data-tab="allTrades">📋 All Trades</li>
-                <li class="tab" data-tab="analytics">📊 Analytics</li>
-                <li class="tab" data-tab="news">📰 News & AI</li>
-            </ul>
-        </div>
-    </nav>
-
-    <main class="main-content">
-        <div class="container">
+        <!-- Main Content -->
+        <main class="main-content">
             <!-- Dashboard Tab -->
-            <div id="dashboard" class="tab-content active">
-                <h2>Portfolio Dashboard</h2>
+            <div class="tab-content active" id="dashboard">
+                <div class="tab-header">
+                    <h1 class="tab-title">Dashboard</h1>
+                    <div class="tab-subtitle">Real-time portfolio overview</div>
+                </div>
+                
                 <div class="dashboard-grid">
-                    <div class="card">
-                        <h3>Total Portfolio Value</h3>
-                        <div class="metric-value" id="totalPortfolioValue">₹0</div>
+                    <div class="glass-card balance-card">
+                        <div class="card-header">
+                            <h3>Portfolio Balance</h3>
+                            <i class="fas fa-wallet card-icon"></i>
+                        </div>
+                        <div class="balance-amount" id="totalBalance">₹0</div>
+                        <div class="balance-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>+2.45%</span>
+                        </div>
                     </div>
-                    <div class="card">
-                        <h3>Available Balance</h3>
-                        <div class="metric-value" id="availableBalance">₹0</div>
+
+                    <div class="glass-card stats-card">
+                        <div class="card-header">
+                            <h3>Total Trades</h3>
+                            <i class="fas fa-exchange-alt card-icon"></i>
+                        </div>
+                        <div class="stat-value" id="totalTrades">0</div>
+                        <div class="stat-label">Positions</div>
                     </div>
-                    <div class="card">
-                        <h3>Total P&L</h3>
-                        <div class="metric-value" id="totalPnL">₹0</div>
+
+                    <div class="glass-card stats-card">
+                        <div class="card-header">
+                            <h3>Win Rate</h3>
+                            <i class="fas fa-trophy card-icon"></i>
+                        </div>
+                        <div class="stat-value" id="winRate">0%</div>
+                        <div class="stat-label">Success Rate</div>
                     </div>
-                    <div class="card">
-                        <h3>Open Positions</h3>
-                        <div class="metric-value" id="openPositions">0</div>
+
+                    <div class="glass-card stats-card">
+                        <div class="card-header">
+                            <h3>P&L Today</h3>
+                            <i class="fas fa-chart-line card-icon"></i>
+                        </div>
+                        <div class="stat-value profit" id="todayPL">₹0</div>
+                        <div class="stat-label">Daily P&L</div>
+                    </div>
+
+                    <div class="glass-card chart-card">
+                        <div class="card-header">
+                            <h3>Account Performance</h3>
+                        </div>
+                        <div class="chart-container" style="position: relative; height: 200px;">
+                            <canvas id="performanceChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="glass-card recent-trades">
+                        <div class="card-header">
+                            <h3>Recent Trades</h3>
+                            <button class="btn-icon">
+                                <i class="fas fa-refresh"></i>
+                            </button>
+                        </div>
+                        <div class="trades-list" id="recentTradesList"></div>
                     </div>
                 </div>
             </div>
 
             <!-- Settings Tab -->
-            <div id="settings" class="tab-content">
-                <h2>Account & Strategy Settings</h2>
+            <div class="tab-content" id="settings">
+                <div class="tab-header">
+                    <h1 class="tab-title">Settings</h1>
+                    <div class="tab-subtitle">Manage accounts and strategies</div>
+                </div>
+                
                 <div class="settings-grid">
-                    <div class="card">
-                        <h3>Accounts</h3>
-                        <div class="form-group">
-                            <input type="text" id="newAccountName" placeholder="Account Name">
-                            <input type="number" id="newAccountBalance" placeholder="Initial Balance">
-                            <button onclick="app.addAccount()" class="btn btn-primary">Add Account</button>
+                    <div class="glass-card">
+                        <div class="card-header">
+                            <h3>Accounts</h3>
+                            <button class="btn-primary" id="addAccountBtn">
+                                <i class="fas fa-plus"></i>
+                                Add Account
+                            </button>
                         </div>
-                        <ul id="accountsList"></ul>
+                        <div class="accounts-list" id="accountsList"></div>
                     </div>
-                    <div class="card">
-                        <h3>Strategies</h3>
-                        <div class="form-group">
-                            <input type="text" id="newStrategyName" placeholder="Strategy Name">
-                            <button onclick="app.addStrategy()" class="btn btn-primary">Add Strategy</button>
+
+                    <div class="glass-card">
+                        <div class="card-header">
+                            <h3>Strategies</h3>
+                            <button class="btn-primary" id="addStrategyBtn">
+                                <i class="fas fa-plus"></i>
+                                Add Strategy
+                            </button>
                         </div>
-                        <ul id="strategiesList"></ul>
+                        <div class="strategies-list" id="strategiesList"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- Add Trade Tab -->
-            <div id="trades" class="tab-content">
-                <h2>Add New Trade</h2>
-                <div class="card">
-                    <form id="tradeForm" class="trade-form">
-                        <div class="form-row">
+            <!-- Trades Tab -->
+            <div class="tab-content" id="trades">
+                <div class="tab-header">
+                    <h1 class="tab-title">Add New Trade</h1>
+                    <div class="tab-subtitle">Record your trading positions</div>
+                </div>
+                
+                <div class="trade-form-container">
+                    <form class="glass-card trade-form" id="tradeForm">
+                        <div class="form-grid">
                             <div class="form-group">
-                                <label>Symbol</label>
-                                <input type="text" id="symbol" placeholder="e.g. RELIANCE" required>
+                                <label class="form-label">Symbol</label>
+                                <input type="text" class="form-control" id="symbol" placeholder="e.g., RELIANCE.NS" required>
                             </div>
+                            
                             <div class="form-group">
-                                <label>Strategy</label>
-                                <select id="strategy" required></select>
-                            </div>
-                            <div class="form-group">
-                                <label>Account</label>
-                                <select id="account" required></select>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Entry Date</label>
-                                <input type="date" id="entryDate" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Buy Price (₹)</label>
-                                <input type="number" id="buyPrice" step="0.01" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Quantity</label>
-                                <input type="number" id="quantity" required>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Stop Loss (₹)</label>
-                                <input type="number" id="stopLoss" step="0.01">
-                            </div>
-                            <div class="form-group">
-                                <label>Target (₹)</label>
-                                <input type="number" id="target" step="0.01">
-                            </div>
-                            <div class="form-group">
-                                <label>Order Type</label>
-                                <select id="orderType">
+                                <label class="form-label">Order Type</label>
+                                <select class="form-control" id="orderType" required>
+                                    <option value="">Select Type</option>
                                     <option value="Long">Long</option>
                                     <option value="Short">Short</option>
                                 </select>
                             </div>
-                        </div>
-                        <div class="form-row">
+
                             <div class="form-group">
-                                <label>Exit Date (Optional)</label>
-                                <input type="date" id="exitDate">
+                                <label class="form-label">Entry Date</label>
+                                <input type="date" class="form-control" id="entryDate" required>
                             </div>
+
                             <div class="form-group">
-                                <label>Exit Price (₹) (Optional)</label>
-                                <input type="number" id="exitPrice" step="0.01">
+                                <label class="form-label">Buy Price</label>
+                                <input type="number" class="form-control" id="buyPrice" placeholder="0.00" step="0.01" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Quantity</label>
+                                <input type="number" class="form-control" id="quantity" placeholder="0" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Stop Loss</label>
+                                <input type="number" class="form-control" id="stopLoss" placeholder="0.00" step="0.01">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Target</label>
+                                <input type="number" class="form-control" id="target" placeholder="0.00" step="0.01">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Strategy</label>
+                                <select class="form-control" id="strategy" required>
+                                    <option value="">Select Strategy</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Account</label>
+                                <select class="form-control" id="account" required>
+                                    <option value="">Select Account</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group full-width">
+                                <label class="form-label">Investment Amount</label>
+                                <div class="investment-display" id="investmentAmount">₹0</div>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-primary">Add Trade</button>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn-primary">
+                                <i class="fas fa-plus"></i>
+                                Add Trade
+                            </button>
+                            <button type="reset" class="btn-secondary">
+                                <i class="fas fa-times"></i>
+                                Clear
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>
 
             <!-- Open Trades Tab -->
-            <div id="openTrades" class="tab-content">
-                <h2>Open Trades</h2>
-                <div class="card">
-                    <div class="table-container">
-                        <table id="openTradesTable">
-                            <thead>
-                                <tr>
-                                    <th>Symbol</th>
-                                    <th>Strategy</th>
-                                    <th>Account</th>
-                                    <th>Entry Date</th>
-                                    <th>Entry Price</th>
-                                    <th>Quantity</th>
-                                    <th>Current P&L</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
+            <div class="tab-content" id="open-trades">
+                <div class="tab-header">
+                    <h1 class="tab-title">Open Positions</h1>
+                    <div class="tab-subtitle">Monitor your active trades</div>
                 </div>
+                
+                <div class="open-trades-grid" id="openTradesGrid"></div>
             </div>
 
             <!-- All Trades Tab -->
-            <div id="allTrades" class="tab-content">
-                <h2>All Trades</h2>
-                <div class="trade-controls">
-                    <div class="filters">
-                        <select id="accountFilter">
-                            <option value="">All Accounts</option>
-                        </select>
-                        <select id="strategyFilter">
-                            <option value="">All Strategies</option>
-                        </select>
-                        <select id="statusFilter">
-                            <option value="">All Status</option>
-                            <option value="Win">Wins</option>
-                            <option value="Loss">Losses</option>
-                            <option value="Open">Open</option>
-                        </select>
-                    </div>
-                    <div class="actions">
-                        <input type="file" id="csvFileInput" accept=".csv" style="display: none;">
-                        <button onclick="document.getElementById('csvFileInput').click()" class="btn btn-secondary">Import CSV</button>
-                        <button onclick="app.exportTradesToCSV()" class="btn btn-secondary">Export CSV</button>
-                        <button onclick="app.deleteSelectedTrades()" class="btn btn-danger">Delete Selected</button>
-                    </div>
+            <div class="tab-content" id="all-trades">
+                <div class="tab-header">
+                    <h1 class="tab-title">All Trades</h1>
+                    <div class="tab-subtitle">Complete trading history</div>
                 </div>
-                <div class="card">
-                    <div class="table-container">
-                        <table id="allTradesTable">
+                
+                <div class="glass-card">
+                    <div class="card-header">
+                        <div class="trades-controls">
+                            <button class="btn-primary" id="importCsvBtn">
+                                <i class="fas fa-upload"></i>
+                                Import CSV
+                            </button>
+                            <button class="btn-secondary" id="exportCsvBtn">
+                                <i class="fas fa-download"></i>
+                                Export CSV
+                            </button>
+                            <button class="btn-danger" id="deleteSelectedBtn" disabled>
+                                <i class="fas fa-trash"></i>
+                                Delete Selected
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="trades-table-container">
+                        <table class="trades-table" id="tradesTable">
                             <thead>
                                 <tr>
                                     <th><input type="checkbox" id="selectAll"></th>
                                     <th>Symbol</th>
-                                    <th>Strategy</th>
-                                    <th>Account</th>
+                                    <th>Type</th>
                                     <th>Entry Date</th>
-                                    <th>Entry Price</th>
-                                    <th>Exit Date</th>
-                                    <th>Exit Price</th>
+                                    <th>Buy Price</th>
                                     <th>Quantity</th>
+                                    <th>Investment</th>
+                                    <th>Current Price</th>
                                     <th>P&L</th>
                                     <th>Status</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
-                            <tbody></tbody>
+                            <tbody id="tradesTableBody"></tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
             <!-- Analytics Tab -->
-            <div id="analytics" class="tab-content">
-                <h2>Performance Analytics</h2>
-
-                <!-- Analytics Filters -->
-                <div class="analytics-filters">
-                    <select id="analyticsAccountFilter">
-                        <option value="">All Accounts</option>
-                    </select>
-                    <select id="analyticsStrategyFilter">
-                        <option value="">All Strategies</option>
-                    </select>
-                    <select id="analyticsStatusFilter">
-                        <option value="">All Trades</option>
-                        <option value="Win">Wins Only</option>
-                        <option value="Loss">Losses Only</option>
-                        <option value="Closed">Closed Trades Only</option>
-                    </select>
-                    <input type="date" id="analyticsDateFrom" placeholder="From Date">
-                    <input type="date" id="analyticsDateTo" placeholder="To Date">
+            <div class="tab-content" id="analytics">
+                <div class="tab-header">
+                    <h1 class="tab-title">Analytics</h1>
+                    <div class="tab-subtitle">Performance insights and metrics</div>
                 </div>
+                
+                <div class="analytics-grid">
+                    <div class="glass-card">
+                        <div class="card-header">
+                            <h3>Equity Curve</h3>
+                        </div>
+                        <div class="chart-container" style="position: relative; height: 300px;">
+                            <canvas id="equityCurveChart"></canvas>
+                        </div>
+                    </div>
 
-                <!-- Metrics Grid -->
-                <div class="metrics-grid">
-                    <div class="metric-card">
-                        <h3>Total Trades</h3>
-                        <div class="metric-value" id="metricTotalTrades">0</div>
+                    <div class="glass-card">
+                        <div class="card-header">
+                            <h3>Win/Loss Distribution</h3>
+                        </div>
+                        <div class="chart-container" style="position: relative; height: 300px;">
+                            <canvas id="winLossChart"></canvas>
+                        </div>
                     </div>
-                    <div class="metric-card">
-                        <h3>Win Rate</h3>
-                        <div class="metric-value" id="metricWinRate">0%</div>
-                    </div>
-                    <div class="metric-card">
-                        <h3>Total P&L</h3>
-                        <div class="metric-value" id="metricTotalPnL">₹0</div>
-                    </div>
-                    <div class="metric-card">
-                        <h3>Profit Factor</h3>
-                        <div class="metric-value" id="metricProfitFactor">0</div>
-                    </div>
-                    <div class="metric-card">
-                        <h3>Best Trade</h3>
-                        <div class="metric-value" id="metricBestTrade">₹0</div>
-                    </div>
-                    <div class="metric-card">
-                        <h3>Worst Trade</h3>
-                        <div class="metric-value" id="metricWorstTrade">₹0</div>
-                    </div>
-                    <div class="metric-card">
-                        <h3>Avg Win</h3>
-                        <div class="metric-value" id="metricAvgWin">₹0</div>
-                    </div>
-                    <div class="metric-card">
-                        <h3>Avg Loss</h3>
-                        <div class="metric-value" id="metricAvgLoss">₹0</div>
-                    </div>
-                </div>
 
-                <!-- Charts Grid -->
-                <div class="charts-grid">
-                    <div class="chart-card">
-                        <h3>Equity Curve</h3>
-                        <canvas id="equityCurveChart"></canvas>
+                    <div class="glass-card">
+                        <div class="card-header">
+                            <h3>Monthly Performance</h3>
+                        </div>
+                        <div class="chart-container" style="position: relative; height: 300px;">
+                            <canvas id="monthlyChart"></canvas>
+                        </div>
                     </div>
-                    <div class="chart-card">
-                        <h3>Win/Loss Distribution</h3>
-                        <canvas id="winLossChart"></canvas>
-                    </div>
-                    <div class="chart-card">
-                        <h3>P&L by Strategy</h3>
-                        <canvas id="strategyChart"></canvas>
-                    </div>
-                    <div class="chart-card">
-                        <h3>Monthly Performance</h3>
-                        <canvas id="monthlyChart"></canvas>
+
+                    <div class="glass-card">
+                        <div class="card-header">
+                            <h3>Strategy Performance</h3>
+                        </div>
+                        <div class="chart-container" style="position: relative; height: 300px;">
+                            <canvas id="strategyChart"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- News & AI Tab -->
-            <div id="news" class="tab-content">
-                <h2>Market News & AI Insights</h2>
-                <div class="card">
-                    <h3>Latest Market News</h3>
-                    <div id="newsContainer">
-                        <p>Loading market news...</p>
-                    </div>
+            <div class="tab-content" id="news">
+                <div class="tab-header">
+                    <h1 class="tab-title">News & AI Insights</h1>
+                    <div class="tab-subtitle">Market news and sentiment analysis</div>
                 </div>
-                <div class="card">
-                    <h3>AI Trading Insights</h3>
-                    <div id="aiInsights">
-                        <p>Analyzing your trading patterns...</p>
+                
+                <div class="news-grid">
+                    <div class="glass-card ai-summary">
+                        <div class="card-header">
+                            <h3>AI Market Summary</h3>
+                            <div class="ai-status">
+                                <div class="status-dot active"></div>
+                                <span>Live Analysis</span>
+                            </div>
+                        </div>
+                        <div class="ai-content">
+                            <div class="sentiment-indicator positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>Market Sentiment: Positive</span>
+                            </div>
+                            <p>Current market conditions show strong bullish momentum across major indices. Tech sector leading gains with increased institutional buying.</p>
+                        </div>
+                    </div>
+
+                    <div class="glass-card news-list">
+                        <div class="card-header">
+                            <h3>Latest Market News</h3>
+                            <button class="btn-icon" id="refreshNews">
+                                <i class="fas fa-refresh"></i>
+                            </button>
+                        </div>
+                        <div class="news-items" id="newsItems"></div>
                     </div>
                 </div>
             </div>
-        </div>
-    </main>
+        </main>
+    </div>
 
+    <!-- Modals -->
+    <div class="modal hidden" id="accountModal">
+        <div class="modal-overlay" id="accountModalOverlay"></div>
+        <div class="modal-content glass-card">
+            <div class="modal-header">
+                <h3>Add Account</h3>
+                <button class="modal-close" id="closeAccountModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="accountForm">
+                <div class="form-group">
+                    <label class="form-label">Account Name</label>
+                    <input type="text" class="form-control" id="accountName" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Initial Balance</label>
+                    <input type="number" class="form-control" id="accountBalance" step="0.01" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Add Account</button>
+                    <button type="button" class="btn-secondary" id="cancelAccount">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal hidden" id="strategyModal">
+        <div class="modal-overlay" id="strategyModalOverlay"></div>
+        <div class="modal-content glass-card">
+            <div class="modal-header">
+                <h3>Add Strategy</h3>
+                <button class="modal-close" id="closeStrategyModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="strategyForm">
+                <div class="form-group">
+                    <label class="form-label">Strategy Name</label>
+                    <input type="text" class="form-control" id="strategyName" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Add Strategy</button>
+                    <button type="button" class="btn-secondary" id="cancelStrategy">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <input type="file" id="csvFileInput" accept=".csv" style="display: none;">
+    
+    <!-- Font Awesome for Icons -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
