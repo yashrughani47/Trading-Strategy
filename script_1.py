@@ -1,34 +1,566 @@
-# Install yfinance first
-!pip install yfinance
+# Create the CSS file with blue and white professional theme
+css_content = """/* Trading Journal Pro - Blue & White Professional Theme */
 
-import yfinance as yf
-import json
-from datetime import datetime, timedelta
+:root {
+    /* Color Variables */
+    --primary-blue: #1E40AF;
+    --light-blue: #3B82F6;
+    --accent-blue: #60A5FA;
+    --dark-blue: #1E3A8A;
+    --white: #FFFFFF;
+    --light-gray: #F8FAFC;
+    --medium-gray: #E2E8F0;
+    --dark-gray: #64748B;
+    --text-dark: #1E293B;
+    --success-green: #059669;
+    --danger-red: #DC2626;
+    --warning-orange: #D97706;
+    
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, var(--primary-blue) 0%, var(--light-blue) 100%);
+    --gradient-light: linear-gradient(135deg, var(--white) 0%, var(--light-gray) 100%);
+    --gradient-accent: linear-gradient(135deg, var(--accent-blue) 0%, var(--light-blue) 100%);
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
 
-# Test fetching some Indian stock data
-symbols = ["RELIANCE.NS", "TCS.NS", "INFY.NS", "HDFCBANK.NS", "ICICIBANK.NS"]
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-stock_data = {}
-for symbol in symbols:
-    try:
-        ticker = yf.Ticker(symbol)
-        hist = ticker.history(period="2d")  # Get last 2 days to get previous close
-        
-        if not hist.empty:
-            previous_close = hist['Close'].iloc[-1]  # Most recent close price
-            stock_data[symbol] = {
-                "symbol": symbol,
-                "previous_close": round(float(previous_close), 2),
-                "currency": "INR",
-                "last_updated": hist.index[-1].strftime("%Y-%m-%d %H:%M:%S"),
-                "volume": int(hist['Volume'].iloc[-1]) if 'Volume' in hist.columns else 0
-            }
-        else:
-            stock_data[symbol] = None
-            
-    except Exception as e:
-        print(f"Error fetching {symbol}: {e}")
-        stock_data[symbol] = None
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--light-gray);
+    color: var(--text-dark);
+    line-height: 1.6;
+    overflow-x: hidden;
+}
 
-print("Stock Data Fetched:")
-print(json.dumps(stock_data, indent=2, default=str))
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+/* Header */
+.header {
+    background: var(--gradient-primary);
+    color: white;
+    padding: 2rem 0;
+    box-shadow: var(--shadow-lg);
+}
+
+.header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+/* Navigation Tabs */
+.nav-tabs {
+    background: white;
+    border-bottom: 1px solid var(--medium-gray);
+    box-shadow: var(--shadow-sm);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.tabs {
+    display: flex;
+    list-style: none;
+    overflow-x: auto;
+    padding: 0;
+}
+
+.tab {
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    font-weight: 500;
+    color: var(--dark-gray);
+}
+
+.tab:hover {
+    background: var(--light-gray);
+    color: var(--primary-blue);
+}
+
+.tab.active {
+    background: var(--light-gray);
+    border-bottom-color: var(--primary-blue);
+    color: var(--primary-blue);
+}
+
+/* Main Content */
+.main-content {
+    padding: 2rem 0;
+    min-height: calc(100vh - 200px);
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Cards */
+.card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow-md);
+    margin-bottom: 1.5rem;
+    border: 1px solid var(--medium-gray);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+}
+
+.card h3 {
+    color: var(--primary-blue);
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+/* Dashboard Grid */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.metric-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-blue);
+    margin-top: 0.5rem;
+}
+
+/* Settings Grid */
+.settings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+/* Forms */
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--text-dark);
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--medium-gray);
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
+}
+
+/* Buttons */
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-block;
+    text-decoration: none;
+    text-align: center;
+}
+
+.btn-primary {
+    background: var(--gradient-primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
+    filter: brightness(1.05);
+}
+
+.btn-secondary {
+    background: var(--medium-gray);
+    color: var(--text-dark);
+}
+
+.btn-secondary:hover {
+    background: var(--dark-gray);
+    color: white;
+}
+
+.btn-danger {
+    background: var(--danger-red);
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #B91C1C;
+    transform: translateY(-1px);
+}
+
+/* Trade Controls */
+.trade-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: var(--shadow-sm);
+}
+
+.filters {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.filters select {
+    padding: 0.5rem;
+    border: 1px solid var(--medium-gray);
+    border-radius: 4px;
+    background: white;
+}
+
+.actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+/* Analytics Filters */
+.analytics-filters {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: var(--shadow-sm);
+}
+
+.analytics-filters select,
+.analytics-filters input {
+    padding: 0.5rem;
+    border: 1px solid var(--medium-gray);
+    border-radius: 4px;
+    background: white;
+}
+
+/* Metrics Grid */
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.metric-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: var(--shadow-md);
+    text-align: center;
+    border: 1px solid var(--medium-gray);
+    transition: all 0.3s ease;
+}
+
+.metric-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.metric-card h3 {
+    font-size: 0.9rem;
+    color: var(--dark-gray);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.metric-card .metric-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-blue);
+}
+
+/* Charts Grid */
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 1.5rem;
+}
+
+.chart-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--medium-gray);
+}
+
+.chart-card h3 {
+    margin-bottom: 1rem;
+    color: var(--primary-blue);
+}
+
+.chart-card canvas {
+    max-height: 300px;
+}
+
+/* Tables */
+.table-container {
+    overflow-x: auto;
+    border-radius: 8px;
+    border: 1px solid var(--medium-gray);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+table th,
+table td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--medium-gray);
+}
+
+table th {
+    background: var(--light-gray);
+    font-weight: 600;
+    color: var(--text-dark);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+table tr:hover {
+    background: rgba(30, 64, 175, 0.05);
+}
+
+/* Status Colors */
+.status-win {
+    color: var(--success-green);
+    font-weight: 600;
+}
+
+.status-loss {
+    color: var(--danger-red);
+    font-weight: 600;
+}
+
+.status-open {
+    color: var(--warning-orange);
+    font-weight: 600;
+}
+
+/* PnL Colors */
+.pnl-positive {
+    color: var(--success-green);
+    font-weight: 600;
+}
+
+.pnl-negative {
+    color: var(--danger-red);
+    font-weight: 600;
+}
+
+.pnl-neutral {
+    color: var(--dark-gray);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .header h1 {
+        font-size: 2rem;
+    }
+    
+    .tabs {
+        padding: 0 1rem;
+    }
+    
+    .tab {
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
+    }
+    
+    .dashboard-grid,
+    .settings-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .trade-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .filters,
+    .actions {
+        justify-content: center;
+    }
+    
+    .analytics-filters {
+        flex-direction: column;
+    }
+    
+    .metrics-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .metric-value {
+        font-size: 1.5rem;
+    }
+}
+
+/* Loading States */
+.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    color: var(--dark-gray);
+}
+
+.loading::before {
+    content: "";
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    border: 2px solid var(--medium-gray);
+    border-top: 2px solid var(--primary-blue);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Animations */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+.slide-up {
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Utility Classes */
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.mb-1 { margin-bottom: 0.5rem; }
+.mb-2 { margin-bottom: 1rem; }
+.mb-3 { margin-bottom: 1.5rem; }
+.mt-1 { margin-top: 0.5rem; }
+.mt-2 { margin-top: 1rem; }
+.mt-3 { margin-top: 1.5rem; }
+
+.hidden { display: none !important; }
+.visible { display: block !important; }
+
+/* Print Styles */
+@media print {
+    .nav-tabs,
+    .trade-controls,
+    .analytics-filters {
+        display: none;
+    }
+    
+    .card {
+        box-shadow: none;
+        border: 1px solid #ccc;
+        page-break-inside: avoid;
+    }
+    
+    .charts-grid {
+        grid-template-columns: 1fr;
+    }
+}"""
+
+# Save CSS file
+with open("style.css", "w", encoding="utf-8") as f:
+    f.write(css_content)
+
+print("✅ style.css created successfully")
