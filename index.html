@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Level-5 Trading Journal (INR)</title>
+    <title>Trading Journal Pro - Ultimate NSE Platform</title>
     <link rel="stylesheet" href="style.css" />
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -11,148 +11,384 @@
   <body>
     <header class="app-header">
       <div class="container flex justify-between items-center py-16">
-        <h1>Trading Journal</h1>
+        <div class="header-brand">
+          <h1>Trading Journal Pro</h1>
+          <p class="header-subtitle">Ultimate NSE Trading Platform</p>
+        </div>
         <nav>
           <ul class="tabs flex gap-16" role="tablist">
-            <li class="tab active" data-tab="dashboard" role="tab">Dashboard</li>
-            <li class="tab" data-tab="settings" role="tab">Settings</li>
-            <li class="tab" data-tab="trades" role="tab">Trades</li>
-            <li class="tab" data-tab="openTrades" role="tab">Open Trades</li>
-            <li class="tab" data-tab="allTrades" role="tab">All Trades</li>
-            <li class="tab" data-tab="analytics" role="tab">Analytics</li>
+            <li class="tab active" data-tab="dashboard" role="tab">
+              <span class="tab-icon">📊</span>
+              Dashboard
+            </li>
+            <li class="tab" data-tab="settings" role="tab">
+              <span class="tab-icon">⚙️</span>
+              Settings
+            </li>
+            <li class="tab" data-tab="trades" role="tab">
+              <span class="tab-icon">📈</span>
+              Trades
+            </li>
+            <li class="tab" data-tab="openTrades" role="tab">
+              <span class="tab-icon">🔄</span>
+              Open Trades
+            </li>
+            <li class="tab" data-tab="allTrades" role="tab">
+              <span class="tab-icon">📋</span>
+              All Trades
+            </li>
+            <li class="tab" data-tab="analytics" role="tab">
+              <span class="tab-icon">📊</span>
+              Analytics
+            </li>
+            <li class="tab" data-tab="news" role="tab">
+              <span class="tab-icon">📰</span>
+              News & AI
+            </li>
           </ul>
         </nav>
+        <div class="header-actions">
+          <button class="btn btn--secondary btn--sm" id="refresh-data">🔄 Refresh</button>
+          <button class="btn btn--primary btn--sm" id="export-all">📥 Export</button>
+        </div>
       </div>
     </header>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay hidden">
+      <div class="loading-spinner"></div>
+      <p>Updating market data...</p>
+    </div>
+
+    <!-- Success/Error Messages -->
+    <div id="message-container" class="message-container"></div>
 
     <!-- TAB SECTIONS -->
     <main class="container">
       <!-- Dashboard -->
       <section id="tab-dashboard" class="tab-section">
-        <div class="flex flex-wrap gap-16" id="dashboard-cards"></div>
-        <div class="my-8">
-          <h2>Recent Trades</h2>
-          <table class="table" id="recent-trades-table"></table>
+        <div class="dashboard-header">
+          <h2>Portfolio Overview</h2>
+          <div class="last-updated">Last Updated: <span id="last-update-time"></span></div>
         </div>
-        <div class="my-8">
-          <h2>Market Indices</h2>
-          <div class="flex gap-16" id="market-indices"></div>
+        
+        <div class="dashboard-grid">
+          <div class="dashboard-cards" id="dashboard-cards"></div>
+          
+          <div class="dashboard-widget">
+            <h3>Performance Summary</h3>
+            <div class="performance-metrics" id="performance-summary"></div>
+          </div>
+        </div>
+
+        <div class="dashboard-section">
+          <h3>Recent Trades</h3>
+          <div class="table-container">
+            <table class="table" id="recent-trades-table"></table>
+          </div>
+        </div>
+
+        <div class="dashboard-section">
+          <h3>Live Market Indices</h3>
+          <div class="market-indices-grid" id="market-indices"></div>
         </div>
       </section>
 
       <!-- Settings -->
       <section id="tab-settings" class="tab-section hidden">
-        <h2>Accounts</h2>
-        <form id="account-form" class="flex gap-8 my-8">
-          <input class="form-control" placeholder="Account Name" id="account-name" required />
-          <input type="number" class="form-control" placeholder="Initial Balance (₹)" id="account-balance" required />
-          <button class="btn btn--primary" type="submit">Add</button>
-        </form>
-        <ul id="accounts-list" class="list"></ul>
+        <div class="settings-grid">
+          <div class="settings-card">
+            <h3>Account Management</h3>
+            <form id="account-form" class="settings-form">
+              <div class="form-group">
+                <label class="form-label">Account Name</label>
+                <input class="form-control" placeholder="Enter account name" id="account-name" required />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Initial Balance (₹)</label>
+                <input type="number" class="form-control" placeholder="Enter balance" id="account-balance" required />
+              </div>
+              <button class="btn btn--primary" type="submit">Add Account</button>
+            </form>
+            <div class="settings-list">
+              <ul id="accounts-list" class="list"></ul>
+            </div>
+          </div>
 
-        <h2 class="mt-8">Strategies</h2>
-        <form id="strategy-form" class="flex gap-8 my-8">
-          <input class="form-control" placeholder="Strategy Name" id="strategy-name" required />
-          <button class="btn btn--primary" type="submit">Add</button>
-        </form>
-        <ul id="strategies-list" class="list"></ul>
+          <div class="settings-card">
+            <h3>Strategy Management</h3>
+            <form id="strategy-form" class="settings-form">
+              <div class="form-group">
+                <label class="form-label">Strategy Name</label>
+                <input class="form-control" placeholder="Enter strategy name" id="strategy-name" required />
+              </div>
+              <button class="btn btn--primary" type="submit">Add Strategy</button>
+            </form>
+            <div class="settings-list">
+              <ul id="strategies-list" class="list"></ul>
+            </div>
+          </div>
 
-        <h2 class="mt-8">AI Integration</h2>
-        <input class="form-control" placeholder="OpenAI / Gemini API Key (mock)" />
+          <div class="settings-card">
+            <h3>Data Management</h3>
+            <div class="data-actions">
+              <button class="btn btn--secondary" id="import-settings">📥 Import Settings</button>
+              <button class="btn btn--secondary" id="export-settings">📤 Export Settings</button>
+              <button class="btn btn--outline" id="reset-data">🔄 Reset Data</button>
+            </div>
+            <input type="file" id="import-file" accept=".json" class="hidden" />
+          </div>
+        </div>
       </section>
 
       <!-- Trades -->
       <section id="tab-trades" class="tab-section hidden">
-        <h2>Add New Trade</h2>
-        <form id="trade-form" class="grid trade-form">
-          <div class="form-group">
-            <label class="form-label">Symbol (.NS) *</label>
-            <input list="symbols" class="form-control" id="trade-symbol" required />
-            <datalist id="symbols"></datalist>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Entry Date *</label>
-            <input type="date" class="form-control" id="trade-entry-date" required />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Entry Price (₹) *</label>
-            <input type="number" step="0.01" class="form-control" id="trade-entry-price" required />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Stop Loss (₹) *</label>
-            <input type="number" step="0.01" class="form-control" id="trade-stoploss" required />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Target (₹) *</label>
-            <input type="number" step="0.01" class="form-control" id="trade-target" required />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Exit Date</label>
-            <input type="date" class="form-control" id="trade-exit-date" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Exit Price (₹)</label>
-            <input type="number" step="0.01" class="form-control" id="trade-exit-price" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">Order Type *</label>
-            <select class="form-control" id="trade-order-type">
-              <option>Long</option>
-              <option>Short</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Strategy *</label>
-            <select class="form-control" id="trade-strategy"></select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Account *</label>
-            <select class="form-control" id="trade-account"></select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Quantity *</label>
-            <input type="number" class="form-control" id="trade-quantity" required />
-          </div>
-          <button class="btn btn--primary" type="submit">Save Trade</button>
-        </form>
+        <div class="trade-form-container">
+          <h2>Add New Trade</h2>
+          <form id="trade-form" class="trade-form">
+            <div class="form-group">
+              <label class="form-label">NSE Symbol *</label>
+              <input list="symbols" class="form-control" id="trade-symbol" placeholder="Search NSE stocks..." required />
+              <datalist id="symbols"></datalist>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Entry Date *</label>
+              <input type="date" class="form-control" id="trade-entry-date" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Entry Price (₹) *</label>
+              <input type="number" step="0.01" class="form-control" id="trade-entry-price" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Stop Loss (₹) *</label>
+              <input type="number" step="0.01" class="form-control" id="trade-stoploss" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Target (₹) *</label>
+              <input type="number" step="0.01" class="form-control" id="trade-target" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Exit Date</label>
+              <input type="date" class="form-control" id="trade-exit-date" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Exit Price (₹)</label>
+              <input type="number" step="0.01" class="form-control" id="trade-exit-price" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Order Type *</label>
+              <select class="form-control" id="trade-order-type">
+                <option>Long</option>
+                <option>Short</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Strategy *</label>
+              <select class="form-control" id="trade-strategy"></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Account *</label>
+              <select class="form-control" id="trade-account"></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Quantity *</label>
+              <input type="number" class="form-control" id="trade-quantity" required />
+            </div>
+            <div class="form-actions">
+              <button class="btn btn--primary" type="submit">Save Trade</button>
+              <button class="btn btn--outline" type="reset">Reset Form</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="trade-calculator">
+          <h3>Risk Calculator</h3>
+          <div class="calculator-results" id="risk-calculator"></div>
+        </div>
       </section>
 
       <!-- Open Trades -->
       <section id="tab-openTrades" class="tab-section hidden">
-        <h2>Open Trades</h2>
-        <table class="table" id="open-trades-table"></table>
-        <div class="my-8">
-          <h3>Open Trades Analytics</h3>
-          <p id="open-analytics"></p>
+        <div class="open-trades-header">
+          <h2>Open Positions</h2>
+          <div class="open-trades-actions">
+            <button class="btn btn--primary" id="refresh-prices">🔄 Refresh Prices</button>
+            <button class="btn btn--secondary" id="close-all-profitable">💰 Close All Profitable</button>
+          </div>
+        </div>
+        
+        <div class="open-trades-summary" id="open-trades-summary"></div>
+        
+        <div class="table-container">
+          <table class="table" id="open-trades-table"></table>
+        </div>
+
+        <div class="open-trades-analytics">
+          <h3>Open Positions Analytics</h3>
+          <div class="analytics-grid" id="open-analytics"></div>
         </div>
       </section>
 
       <!-- All Trades -->
       <section id="tab-allTrades" class="tab-section hidden">
-        <div class="flex justify-between items-center">
-          <h2>All Trades</h2>
-          <button class="btn btn--outline" id="delete-selected">Delete Selected</button>
+        <div class="all-trades-header">
+          <h2>Complete Trading History</h2>
+          <div class="all-trades-actions">
+            <button class="btn btn--outline" id="delete-selected">🗑️ Delete Selected</button>
+            <button class="btn btn--secondary" id="import-trades">📥 Import CSV</button>
+            <button class="btn btn--primary" id="export-trades">📤 Export CSV</button>
+          </div>
         </div>
-        <table class="table" id="all-trades-table"></table>
+
+        <div class="trades-filters">
+          <div class="filter-group">
+            <select class="form-control" id="filter-account">
+              <option value="">All Accounts</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <select class="form-control" id="filter-strategy">
+              <option value="">All Strategies</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <select class="form-control" id="filter-status">
+              <option value="">All Status</option>
+              <option value="Win">Winners</option>
+              <option value="Loss">Losers</option>
+              <option value="Open">Open</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <input type="text" class="form-control" id="filter-symbol" placeholder="Filter by symbol..." />
+          </div>
+          <button class="btn btn--outline" id="clear-filters">Clear Filters</button>
+        </div>
+        
+        <div class="table-container">
+          <table class="table" id="all-trades-table"></table>
+        </div>
+
+        <div class="pagination" id="pagination"></div>
+        
+        <input type="file" id="import-csv" accept=".csv" class="hidden" />
       </section>
 
       <!-- Analytics -->
       <section id="tab-analytics" class="tab-section hidden">
-        <h2>Analytics</h2>
-        <div class="chart-container" style="position: relative; height: 400px;">
-          <canvas id="equity-chart"></canvas>
-        </div>
-        <div class="flex gap-16 my-8">
-          <div class="chart-container" style="position: relative; height: 300px; width: 300px;">
-            <canvas id="winloss-chart"></canvas>
+        <div class="analytics-header">
+          <h2>Advanced Analytics</h2>
+          <div class="analytics-filters">
+            <select class="form-control" id="analytics-account">
+              <option value="">All Accounts</option>
+            </select>
+            <select class="form-control" id="analytics-strategy">
+              <option value="">All Strategies</option>
+            </select>
+            <select class="form-control" id="analytics-period">
+              <option value="all">All Time</option>
+              <option value="30">Last 30 Days</option>
+              <option value="90">Last 90 Days</option>
+              <option value="365">Last Year</option>
+            </select>
           </div>
-          <div class="card flex-1">
-            <div class="card__body">
-              <h3>AI Insights</h3>
-              <ul id="ai-insights" class="list"></ul>
-              <button class="btn btn--primary mt-8" id="generate-insight">Generate New Insight</button>
+        </div>
+
+        <div class="analytics-grid">
+          <div class="analytics-card">
+            <div class="chart-container" style="position: relative; height: 400px;">
+              <canvas id="equity-chart"></canvas>
             </div>
           </div>
+
+          <div class="analytics-card">
+            <div class="chart-container" style="position: relative; height: 400px;">
+              <canvas id="monthly-pnl-chart"></canvas>
+            </div>
+          </div>
+
+          <div class="analytics-card">
+            <div class="chart-container" style="position: relative; height: 300px;">
+              <canvas id="winloss-chart"></canvas>
+            </div>
+          </div>
+
+          <div class="analytics-card">
+            <div class="chart-container" style="position: relative; height: 300px;">
+              <canvas id="strategy-performance-chart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <h4>Win Rate</h4>
+            <div class="metric-value" id="win-rate">0%</div>
+          </div>
+          <div class="metric-card">
+            <h4>Profit Factor</h4>
+            <div class="metric-value" id="profit-factor">0.00</div>
+          </div>
+          <div class="metric-card">
+            <h4>Max Drawdown</h4>
+            <div class="metric-value" id="max-drawdown">0%</div>
+          </div>
+          <div class="metric-card">
+            <h4>Sharpe Ratio</h4>
+            <div class="metric-value" id="sharpe-ratio">0.00</div>
+          </div>
+          <div class="metric-card">
+            <h4>Avg Win</h4>
+            <div class="metric-value" id="avg-win">₹0</div>
+          </div>
+          <div class="metric-card">
+            <h4>Avg Loss</h4>
+            <div class="metric-value" id="avg-loss">₹0</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- News & AI -->
+      <section id="tab-news" class="tab-section hidden">
+        <div class="news-header">
+          <h2>Market News & AI Insights</h2>
+          <div class="news-filters">
+            <select class="form-control" id="news-filter">
+              <option value="all">All News</option>
+              <option value="relevant">Relevant to Portfolio</option>
+              <option value="positive">Positive Sentiment</option>
+              <option value="negative">Negative Sentiment</option>
+            </select>
+            <button class="btn btn--primary" id="refresh-news">🔄 Refresh News</button>
+          </div>
+        </div>
+
+        <div class="news-grid">
+          <div class="news-section">
+            <h3>Latest Market News</h3>
+            <div class="news-feed" id="news-feed"></div>
+          </div>
+
+          <div class="ai-section">
+            <h3>AI-Powered Insights</h3>
+            <div class="ai-insights-container">
+              <div class="ai-insights" id="ai-insights"></div>
+              <div class="ai-actions">
+                <button class="btn btn--primary" id="generate-insight">🤖 Generate New Insight</button>
+                <button class="btn btn--secondary" id="analyze-portfolio">📊 Analyze Portfolio</button>
+              </div>
+            </div>
+
+            <div class="ai-recommendations">
+              <h4>Smart Recommendations</h4>
+              <div id="ai-recommendations"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="market-sentiment">
+          <h3>Market Sentiment Analysis</h3>
+          <div class="sentiment-indicators" id="sentiment-indicators"></div>
         </div>
       </section>
     </main>
