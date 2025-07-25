@@ -1,5 +1,5 @@
 // Trading Journal Pro - Ultimate NSE Platform
-// Fixed version with WORKING tab navigation and NO spinning loaders
+// Enhanced version with comprehensive Analytics functionality and fixed dropdown filters
 
 class TradingJournalPro {
   constructor() {
@@ -20,27 +20,16 @@ class TradingJournalPro {
     this.currentPage = 1;
     this.pageSize = 20;
     this.filters = {};
+    this.analyticsFilters = {};
+    this.charts = {};
     
     // Comprehensive NSE stock database
     this.nseStocks = [
-      // NSE 500 Major Stocks
       "RELIANCE.NS", "TCS.NS", "HDFCBANK.NS", "BHARTIARTL.NS", "ICICIBANK.NS", "SBIN.NS", "INFY.NS", "LT.NS", "ITC.NS", "HCLTECH.NS",
       "BAJFINANCE.NS", "HINDUNILVR.NS", "KOTAKBANK.NS", "ASIANPAINT.NS", "MARUTI.NS", "TITAN.NS", "SUNPHARMA.NS", "ULTRACEMCO.NS", 
       "AXISBANK.NS", "NESTLEIND.NS", "WIPRO.NS", "ADANIENT.NS", "BAJAJFINSV.NS", "ONGC.NS", "NTPC.NS", "POWERGRID.NS", "M&M.NS",
       "TECHM.NS", "TATAMOTORS.NS", "COALINDIA.NS", "DRREDDY.NS", "JSWSTEEL.NS", "GRASIM.NS", "BRITANNIA.NS", "CIPLA.NS", "EICHERMOT.NS",
-      "APOLLOHOSP.NS", "BPCL.NS", "HINDALCO.NS", "DIVISLAB.NS", "HEROMOTOCO.NS", "SHREECEM.NS", "BAJAJ-AUTO.NS", "ADANIPORTS.NS",
-      
-      // Banking & Financial Services
-      "HDFCLIFE.NS", "ICICIPRULI.NS", "SBILIFE.NS", "BAJAJHLDNG.NS", "PFC.NS", "RECLTD.NS", "LICHSGFIN.NS", "M&MFIN.NS", "CHOLAFIN.NS",
-      "BAJAJHFL.NS", "INDUSINDBK.NS", "FEDERALBNK.NS", "BANDHANBNK.NS", "IDFCFIRSTB.NS", "PNB.NS", "CANBK.NS", "UNIONBANK.NS", "IOB.NS",
-      
-      // IT & Technology
-      "MINDTREE.NS", "MPHASIS.NS", "LTI.NS", "COFORGE.NS", "PERSISTENT.NS", "LTTS.NS", "TATAELXSI.NS", "NIITLTD.NS", "KPITTECH.NS",
-      "ROLTA.NS", "CYIENT.NS", "ZENSAR.NS", "HEXAWARE.NS", "SONATSOFTW.NS", "INTELLECT.NS", "RAMCOCEM.NS", "POLYCAB.NS",
-      
-      // Additional stocks to reach 500+
-      "LUPIN.NS", "BIOCON.NS", "CADILAHC.NS", "TORNTPHARM.NS", "AUROPHARMA.NS", "GLENMARK.NS", "ALKEM.NS", "LALPATHLAB.NS", "METROPOLIS.NS",
-      "FORTIS.NS", "MAXHEALTH.NS", "APOLLOTYRE.NS", "PFIZER.NS", "ABBOTINDIA.NS", "GLAXO.NS", "NOVARTIS.NS", "SANOFI.NS"
+      "APOLLOHOSP.NS", "BPCL.NS", "HINDALCO.NS", "DIVISLAB.NS", "HEROMOTOCO.NS", "SHREECEM.NS", "BAJAJ-AUTO.NS", "ADANIPORTS.NS"
     ];
     
     // AI Insights Database
@@ -61,13 +50,9 @@ class TradingJournalPro {
       "Consider profit booking in overweight positions above 10% allocation",
       "Recent market sentiment suggests cautious approach to new positions"
     ];
-    
-    // Bind methods to preserve 'this' context
-    this.handleTabClick = this.handleTabClick.bind(this);
   }
 
   init() {
-    // Wait for DOM to be fully loaded
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => this.initializeApp());
     } else {
@@ -80,58 +65,10 @@ class TradingJournalPro {
     this.loadData();
     this.setupEventListeners();
     this.initStockAutocomplete();
-    this.initializeLivePrices(); // Initialize prices immediately
     this.startLivePriceUpdates();
     this.updateLastRefreshTime();
     this.renderActiveTab();
     console.log('Trading Journal Pro initialized successfully');
-  }
-
-  // FIXED Tab Navigation
-  handleTabClick(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    const tabElement = e.currentTarget;
-    const tabName = tabElement.dataset.tab;
-    
-    console.log('Tab clicked:', tabName);
-    
-    if (tabName) {
-      this.switchTab(tabName);
-    }
-  }
-
-  switchTab(tabName) {
-    console.log('Switching to tab:', tabName);
-    
-    // Update active tab visual state
-    document.querySelectorAll('.tab').forEach(tab => {
-      tab.classList.remove('active');
-    });
-    
-    const activeTabElement = document.querySelector(`[data-tab="${tabName}"]`);
-    if (activeTabElement) {
-      activeTabElement.classList.add('active');
-    }
-    
-    // Show/hide sections
-    document.querySelectorAll('.tab-section').forEach(section => {
-      section.classList.add('hidden');
-    });
-    
-    const targetSection = document.getElementById(`tab-${tabName}`);
-    if (targetSection) {
-      targetSection.classList.remove('hidden');
-      console.log(`Tab section ${tabName} shown`);
-    } else {
-      console.error(`Tab section tab-${tabName} not found`);
-    }
-    
-    this.activeTab = tabName;
-    
-    // Render the active tab content
-    this.renderActiveTab();
   }
 
   // Data Management
@@ -152,44 +89,92 @@ class TradingJournalPro {
 
   loadSampleData() {
     this.data.accounts = [
-      {id: 1, name: "Main Trading Account", initialBalance: 500000, currentBalance: 525000},
-      {id: 2, name: "Swing Trading Portfolio", initialBalance: 300000, currentBalance: 315000},
-      {id: 3, name: "Long Term Investments", initialBalance: 1000000, currentBalance: 1050000}
+      {id: 1, name: "Trading Account 1", initialBalance: 500000, currentBalance: 525000},
+      {id: 2, name: "Trading Account 2", initialBalance: 300000, currentBalance: 315000},
+      {id: 3, name: "Investment Account", initialBalance: 1000000, currentBalance: 1050000}
     ];
 
     this.data.strategies = [
-      {id: 1, name: "Breakout Trading"},
-      {id: 2, name: "Support & Resistance"},
-      {id: 3, name: "Moving Average Crossover"},
-      {id: 4, name: "RSI Divergence"},
-      {id: 5, name: "Volume Breakout"},
-      {id: 6, name: "Gap Trading"},
-      {id: 7, name: "Momentum Scalping"},
-      {id: 8, name: "Swing Position"}
+      {id: 1, name: "Breakout"},
+      {id: 2, name: "Momentum"},
+      {id: 3, name: "Swing Trading"},
+      {id: 4, name: "Value Investing"}
     ];
 
+    // Enhanced sample trades with more comprehensive data
     this.data.trades = [
       {
-        id: 1, symbol: "RELIANCE.NS", entryDate: "2025-01-20", entryPrice: 2450,
-        stopLoss: 2400, target: 2550, exitDate: "2025-01-25", exitPrice: 2520,
-        orderType: "Long", strategy: "Breakout Trading", account: "Main Trading Account",
-        quantity: 20, pnl: 1400, pnlPercent: 2.86, status: "Win"
+        id: 1, symbol: "RELIANCE.NS", entryDate: "2024-01-15", exitDate: "2024-01-18",
+        entryPrice: 2500, exitPrice: 2600, stopLoss: 2400, target: 2650, quantity: 10,
+        orderType: "Long", strategy: "Breakout", account: "Trading Account 1",
+        pnl: 1000, pnlPercent: 4.0, status: "Win"
       },
       {
-        id: 2, symbol: "TCS.NS", entryDate: "2025-01-22", entryPrice: 3850,
-        stopLoss: 3800, target: 3950, orderType: "Long", strategy: "Support & Resistance",
-        account: "Swing Trading Portfolio", quantity: 15, status: "Open"
+        id: 2, symbol: "TCS.NS", entryDate: "2024-01-20", exitDate: "2024-01-22",
+        entryPrice: 3800, exitPrice: 3750, stopLoss: 3700, target: 3900, quantity: 5,
+        orderType: "Long", strategy: "Momentum", account: "Trading Account 1",
+        pnl: -250, pnlPercent: -1.32, status: "Loss"
       },
       {
-        id: 3, symbol: "HDFCBANK.NS", entryDate: "2025-01-18", entryPrice: 1650,
-        stopLoss: 1600, target: 1750, exitDate: "2025-01-24", exitPrice: 1720,
-        orderType: "Long", strategy: "Moving Average Crossover", account: "Long Term Investments",
-        quantity: 30, pnl: 2100, pnlPercent: 4.24, status: "Win"
+        id: 3, symbol: "INFY.NS", entryDate: "2024-02-05", exitDate: "2024-02-08",
+        entryPrice: 1500, exitPrice: 1620, stopLoss: 1450, target: 1600, quantity: 20,
+        orderType: "Long", strategy: "Swing Trading", account: "Trading Account 2",
+        pnl: 2400, pnlPercent: 8.0, status: "Win"
       },
       {
-        id: 4, symbol: "ICICIBANK.NS", entryDate: "2025-01-23", entryPrice: 1050,
-        stopLoss: 1020, target: 1100, orderType: "Long", strategy: "RSI Divergence",
-        account: "Main Trading Account", quantity: 25, status: "Open"
+        id: 4, symbol: "HDFC.NS", entryDate: "2024-02-12", exitDate: "2024-02-15",
+        entryPrice: 1800, exitPrice: 1750, stopLoss: 1750, target: 1900, quantity: 15,
+        orderType: "Long", strategy: "Value Investing", account: "Investment Account",
+        pnl: -750, pnlPercent: -2.78, status: "Loss"
+      },
+      {
+        id: 5, symbol: "ICICIBANK.NS", entryDate: "2024-03-01", exitDate: "2024-03-05",
+        entryPrice: 950, exitPrice: 1020, stopLoss: 920, target: 1000, quantity: 25,
+        orderType: "Long", strategy: "Breakout", account: "Trading Account 1",
+        pnl: 1750, pnlPercent: 7.37, status: "Win"
+      },
+      {
+        id: 6, symbol: "SBIN.NS", entryDate: "2024-03-10", exitDate: "2024-03-12",
+        entryPrice: 600, exitPrice: 580, stopLoss: 580, target: 640, quantity: 30,
+        orderType: "Long", strategy: "Momentum", account: "Trading Account 2",
+        pnl: -600, pnlPercent: -3.33, status: "Loss"
+      },
+      {
+        id: 7, symbol: "WIPRO.NS", entryDate: "2024-03-15", exitDate: "2024-03-18",
+        entryPrice: 450, exitPrice: 485, stopLoss: 430, target: 480, quantity: 40,
+        orderType: "Long", strategy: "Swing Trading", account: "Trading Account 1",
+        pnl: 1400, pnlPercent: 7.78, status: "Win"
+      },
+      {
+        id: 8, symbol: "MARUTI.NS", entryDate: "2024-03-20", exitDate: "2024-03-25",
+        entryPrice: 9500, exitPrice: 9200, stopLoss: 9200, target: 10000, quantity: 2,
+        orderType: "Long", strategy: "Value Investing", account: "Investment Account",
+        pnl: -600, pnlPercent: -3.16, status: "Loss"
+      },
+      {
+        id: 9, symbol: "TITAN.NS", entryDate: "2024-04-01", exitDate: "2024-04-05",
+        entryPrice: 2800, exitPrice: 3000, stopLoss: 2700, target: 3000, quantity: 8,
+        orderType: "Long", strategy: "Breakout", account: "Trading Account 2",
+        pnl: 1600, pnlPercent: 7.14, status: "Win"
+      },
+      {
+        id: 10, symbol: "ASIANPAINT.NS", entryDate: "2024-04-10", exitDate: "2024-04-12",
+        entryPrice: 3200, exitPrice: 3100, stopLoss: 3100, target: 3400, quantity: 5,
+        orderType: "Long", strategy: "Momentum", account: "Trading Account 1",
+        pnl: -500, pnlPercent: -3.13, status: "Loss"
+      },
+      // Open trades
+      {
+        id: 11, symbol: "BHARTIARTL.NS", entryDate: "2024-04-15", 
+        entryPrice: 850, stopLoss: 820, target: 900, quantity: 20,
+        orderType: "Long", strategy: "Breakout", account: "Trading Account 1",
+        status: "Open"
+      },
+      {
+        id: 12, symbol: "LT.NS", entryDate: "2024-04-18",
+        entryPrice: 2400, stopLoss: 2350, target: 2500, quantity: 6,
+        orderType: "Long", strategy: "Swing Trading", account: "Trading Account 2",
+        status: "Open"
       }
     ];
 
@@ -206,13 +191,21 @@ class TradingJournalPro {
     }
   }
 
-  // Event Listeners - FIXED VERSION
+  // Event Listeners
   setupEventListeners() {
     console.log('Setting up event listeners...');
     
-    // FIXED Tab switching with proper event binding
+    // Tab switching
     document.querySelectorAll('.tab').forEach(tab => {
-      tab.addEventListener('click', this.handleTabClick);
+      tab.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const tabElement = e.target.closest('.tab');
+        if (tabElement && tabElement.dataset.tab) {
+          console.log('Tab clicked:', tabElement.dataset.tab);
+          this.switchTab(tabElement.dataset.tab);
+        }
+      });
     });
 
     // Header actions
@@ -251,9 +244,10 @@ class TradingJournalPro {
       this.addEventListenerSafe(id, 'change', () => this.applyFilters());
     });
 
-    // Analytics filters
-    ['analytics-account', 'analytics-strategy', 'analytics-period'].forEach(id => {
-      this.addEventListenerSafe(id, 'change', () => this.renderAnalytics());
+    // Analytics filters - FIXED
+    this.addEventListenerSafe('apply-analytics-filters', 'click', () => this.applyAnalyticsFilters());
+    ['analytics-account', 'analytics-strategy', 'analytics-result', 'analytics-date-from', 'analytics-date-to'].forEach(id => {
+      this.addEventListenerSafe(id, 'change', () => this.applyAnalyticsFilters());
     });
 
     // News and AI
@@ -272,6 +266,40 @@ class TradingJournalPro {
     } else {
       console.warn(`Element with id '${elementId}' not found`);
     }
+  }
+
+  switchTab(tabName) {
+    console.log('Switching to tab:', tabName);
+    
+    // Update active tab visual state
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.classList.remove('active');
+    });
+    
+    const activeTabElement = document.querySelector(`[data-tab="${tabName}"]`);
+    if (activeTabElement) {
+      activeTabElement.classList.add('active');
+    }
+    
+    // Show/hide sections
+    document.querySelectorAll('.tab-section').forEach(section => {
+      section.classList.add('hidden');
+    });
+    
+    const targetSection = document.getElementById(`tab-${tabName}`);
+    if (targetSection) {
+      targetSection.classList.remove('hidden');
+      console.log(`Tab section ${tabName} shown`);
+    } else {
+      console.error(`Tab section tab-${tabName} not found`);
+    }
+    
+    this.activeTab = tabName;
+    
+    // Small delay to ensure DOM is updated before rendering
+    setTimeout(() => {
+      this.renderActiveTab();
+    }, 50);
   }
 
   renderActiveTab() {
@@ -571,9 +599,6 @@ class TradingJournalPro {
     if (entryDateInput) {
       entryDateInput.value = new Date().toISOString().split('T')[0];
     }
-    
-    // Initialize calculator
-    this.calculateRisk();
   }
 
   calculateRisk() {
@@ -672,7 +697,10 @@ class TradingJournalPro {
     this.showMessage('Trade added successfully!', 'success');
     
     // Reset calculator
-    this.calculateRisk();
+    const calculator = document.getElementById('risk-calculator');
+    if (calculator) {
+      calculator.innerHTML = '<p>Enter trade details to see risk calculations</p>';
+    }
   }
 
   // Open Trades
@@ -773,7 +801,7 @@ class TradingJournalPro {
         <div class="value positive">${profitable.length} of ${openTrades.length}</div>
       </div>
       <div class="analytics-item">
-        <h4>Success Rate</h4> 
+        <h4>Success Rate</h4>
         <div class="value">${openTrades.length > 0 ? ((profitable.length / openTrades.length) * 100).toFixed(1) : 0}%</div>
       </div>
       <div class="analytics-item">
@@ -856,24 +884,33 @@ class TradingJournalPro {
     this.applyFilters();
   }
 
+  // FIXED: Enhanced populate filter dropdowns function
   populateFilterDropdowns() {
+    console.log('Populating filter dropdowns...');
+    
+    // All trades filters
     const accountFilter = document.getElementById('filter-account');
     const strategyFilter = document.getElementById('filter-strategy');
+    
+    // Analytics filters
     const analyticsAccount = document.getElementById('analytics-account');
     const analyticsStrategy = document.getElementById('analytics-strategy');
 
     const accountOptions = this.data.accounts.map(a => `<option value="${a.name}">${a.name}</option>`).join('');
     const strategyOptions = this.data.strategies.map(s => `<option value="${s.name}">${s.name}</option>`).join('');
 
+    // Populate all trades filters
     [accountFilter, analyticsAccount].forEach(select => {
       if (select) {
         select.innerHTML = '<option value="">All Accounts</option>' + accountOptions;
+        console.log(`Populated ${select.id} with ${this.data.accounts.length} accounts`);
       }
     });
 
     [strategyFilter, analyticsStrategy].forEach(select => {
       if (select) {
         select.innerHTML = '<option value="">All Strategies</option>' + strategyOptions;
+        console.log(`Populated ${select.id} with ${this.data.strategies.length} strategies`);
       }
     });
   }
@@ -1001,44 +1038,209 @@ class TradingJournalPro {
     }
   }
 
-  // Analytics
+  // COMPREHENSIVE ANALYTICS IMPLEMENTATION
   renderAnalytics() {
-    console.log('Rendering analytics...');
+    console.log('Rendering comprehensive analytics...');
+    this.populateFilterDropdowns();
+    // Apply default filters (no filters initially)
     setTimeout(() => {
-      this.renderEquityChart();
-      this.renderMonthlyPnLChart();
-      this.renderWinLossChart();
-      this.renderStrategyPerformanceChart();
-      this.renderAdvancedMetrics();
+      this.applyAnalyticsFilters();
     }, 100);
   }
 
-  renderEquityChart() {
+  // FIXED: Enhanced analytics filters application
+  applyAnalyticsFilters() {
+    console.log('Applying analytics filters...');
+    
+    // Get filter values
+    this.analyticsFilters = {
+      account: document.getElementById('analytics-account')?.value || '',
+      strategy: document.getElementById('analytics-strategy')?.value || '',
+      result: document.getElementById('analytics-result')?.value || '',
+      dateFrom: document.getElementById('analytics-date-from')?.value || '',
+      dateTo: document.getElementById('analytics-date-to')?.value || ''
+    };
+
+    console.log('Analytics filters:', this.analyticsFilters);
+
+    // Filter trades based on criteria
+    let filteredTrades = this.data.trades.filter(trade => {
+      // Account filter
+      if (this.analyticsFilters.account && trade.account !== this.analyticsFilters.account) {
+        return false;
+      }
+      
+      // Strategy filter
+      if (this.analyticsFilters.strategy && trade.strategy !== this.analyticsFilters.strategy) {
+        return false;
+      }
+      
+      // Result filter
+      if (this.analyticsFilters.result && trade.status !== this.analyticsFilters.result) {
+        return false;
+      }
+      
+      // Date filters
+      if (this.analyticsFilters.dateFrom) {
+        const tradeDate = new Date(trade.entryDate);
+        const fromDate = new Date(this.analyticsFilters.dateFrom);
+        if (tradeDate < fromDate) return false;
+      }
+      
+      if (this.analyticsFilters.dateTo) {
+        const tradeDate = new Date(trade.entryDate);
+        const toDate = new Date(this.analyticsFilters.dateTo);
+        if (tradeDate > toDate) return false;
+      }
+      
+      return true;
+    });
+
+    console.log(`Filtered trades: ${filteredTrades.length} of ${this.data.trades.length}`);
+    
+    // Render all analytics components with filtered data
+    this.renderKPICards(filteredTrades);
+    this.renderAnalyticsCharts(filteredTrades);
+    this.renderAnalyticsTables(filteredTrades);
+  }
+
+  renderKPICards(trades) {
+    console.log('Rendering KPI cards...');
+    
+    const closedTrades = trades.filter(t => t.status !== 'Open');
+    const winningTrades = closedTrades.filter(t => t.status === 'Win');
+    const losingTrades = closedTrades.filter(t => t.status === 'Loss');
+    
+    // Calculate metrics
+    const totalPnL = closedTrades.reduce((sum, trade) => sum + (trade.pnl || 0), 0);
+    const winRate = closedTrades.length > 0 ? (winningTrades.length / closedTrades.length * 100) : 0;
+    const totalTrades = closedTrades.length;
+    
+    const totalWins = winningTrades.reduce((sum, trade) => sum + trade.pnl, 0);
+    const totalLosses = Math.abs(losingTrades.reduce((sum, trade) => sum + trade.pnl, 0));
+    const profitFactor = totalLosses > 0 ? (totalWins / totalLosses) : 0;
+    
+    const avgWin = winningTrades.length > 0 ? (totalWins / winningTrades.length) : 0;
+    const avgLoss = losingTrades.length > 0 ? (totalLosses / losingTrades.length) : 0;
+    const riskRewardRatio = avgLoss > 0 ? (avgWin / avgLoss) : 0;
+    
+    const avgPnLPerTrade = totalTrades > 0 ? (totalPnL / totalTrades) : 0;
+    
+    // Sharpe Ratio calculation
+    const returns = closedTrades.map(t => (t.pnlPercent || 0));
+    const avgReturn = returns.length > 0 ? (returns.reduce((sum, r) => sum + r, 0) / returns.length) : 0;
+    const stdDev = returns.length > 1 ? Math.sqrt(returns.reduce((sum, r) => sum + Math.pow(r - avgReturn, 2), 0) / (returns.length - 1)) : 1;
+    const sharpeRatio = stdDev > 0 ? (avgReturn / stdDev) : 0;
+    
+    // Max Drawdown calculation
+    let peak = 0;
+    let maxDrawdown = 0;
+    let cumulative = 0;
+    
+    closedTrades.sort((a, b) => new Date(a.entryDate) - new Date(b.entryDate)).forEach(trade => {
+      cumulative += trade.pnl;
+      if (cumulative > peak) peak = cumulative;
+      const drawdown = peak - cumulative;
+      if (drawdown > maxDrawdown) maxDrawdown = drawdown;
+    });
+    
+    const maxDrawdownPercent = peak > 0 ? (maxDrawdown / peak * 100) : 0;
+    
+    // Expectancy calculation
+    const winProb = winRate / 100;
+    const lossProb = 1 - winProb;
+    const expectancy = (winProb * avgWin) - (lossProb * avgLoss);
+
+    // Update KPI cards
+    const elements = {
+      'kpi-total-pnl': `₹${this.formatCurrency(totalPnL)}`,
+      'kpi-win-rate': `${winRate.toFixed(1)}%`,
+      'kpi-total-trades': totalTrades,
+      'kpi-trades-breakdown': `${winningTrades.length} W | ${losingTrades.length} L`,
+      'kpi-profit-factor': profitFactor.toFixed(2),
+      'kpi-sharpe-ratio': sharpeRatio.toFixed(2),
+      'kpi-max-drawdown': `${maxDrawdownPercent.toFixed(1)}%`,
+      'kpi-avg-pnl': `₹${this.formatCurrency(avgPnLPerTrade)}`,
+      'kpi-risk-reward': `1:${riskRewardRatio.toFixed(2)}`,
+      'kpi-expectancy': `₹${this.formatCurrency(expectancy)}`
+    };
+
+    Object.entries(elements).forEach(([id, value]) => {
+      const element = document.getElementById(id);
+      if (element) {
+        element.textContent = value;
+        
+        // Add color classes for certain elements
+        if (id === 'kpi-total-pnl') {
+          element.className = `kpi-value ${totalPnL >= 0 ? 'positive' : 'negative'}`;
+        }
+      }
+    });
+
+    // Update progress bar for win rate
+    const progressBar = document.getElementById('win-rate-progress');
+    if (progressBar) {
+      progressBar.style.width = `${Math.min(winRate, 100)}%`;
+    }
+
+    // Update change indicators
+    const pnlChange = document.getElementById('kpi-total-pnl-change');
+    if (pnlChange) {
+      const changePercent = totalPnL >= 0 ? '+' : '';
+      pnlChange.textContent = `${changePercent}${((totalPnL / 100000) * 100).toFixed(2)}%`;
+      pnlChange.className = `kpi-change ${totalPnL >= 0 ? 'positive' : 'negative'}`;
+    }
+  }
+
+  renderAnalyticsCharts(trades) {
+    console.log('Rendering analytics charts...');
+    
+    // Small delay to ensure DOM is ready
+    setTimeout(() => {
+      this.renderEquityChart(trades);
+      this.renderWinLossChart(trades);
+      this.renderStrategyPerformanceChart(trades);
+      this.renderMonthlyPnLChart(trades);
+    }, 100);
+  }
+
+  renderEquityChart(trades) {
     const canvas = document.getElementById('equity-chart');
-    if (!canvas) return;
+    if (!canvas) {
+      console.warn('Equity chart canvas not found');
+      return;
+    }
     
     const ctx = canvas.getContext('2d');
-    const trades = this.data.trades.filter(t => t.pnl !== undefined).sort((a, b) => new Date(a.entryDate) - new Date(b.entryDate));
+    const closedTrades = trades.filter(t => t.pnl !== undefined).sort((a, b) => new Date(a.entryDate) - new Date(b.entryDate));
+    
     let cumulative = 0;
-    const data = trades.map(trade => {
+    const data = closedTrades.map(trade => {
       cumulative += trade.pnl;
       return { x: trade.entryDate, y: cumulative };
     });
 
-    if (window.equityChart) {
-      window.equityChart.destroy();
+    // Add initial point at zero
+    if (data.length > 0) {
+      data.unshift({ x: data[0].x, y: 0 });
     }
 
-    window.equityChart = new Chart(ctx, {
+    if (this.charts.equityChart) {
+      this.charts.equityChart.destroy();
+    }
+
+    this.charts.equityChart = new Chart(ctx, {
       type: 'line',
       data: {
         datasets: [{
           label: 'Cumulative P&L (₹)',
           data: data,
-          borderColor: '#1E40AF',
-          backgroundColor: 'rgba(30, 64, 175, 0.1)',
+          borderColor: '#1FB8CD',
+          backgroundColor: 'rgba(31, 184, 205, 0.1)',
           fill: true,
-          tension: 0.4
+          tension: 0.4,
+          pointRadius: 4,
+          pointHoverRadius: 6
         }]
       },
       options: {
@@ -1047,7 +1249,12 @@ class TradingJournalPro {
         plugins: {
           title: {
             display: true,
-            text: 'Equity Curve'
+            text: 'Cumulative P&L Over Time',
+            font: { size: 16, weight: 'bold' }
+          },
+          legend: {
+            display: true,
+            position: 'top'
           }
         },
         scales: {
@@ -1057,78 +1264,49 @@ class TradingJournalPro {
             title: { display: true, text: 'Date' }
           },
           y: { 
-            beginAtZero: true,
-            title: { display: true, text: 'Cumulative P&L (₹)' }
-          }
-        }
-      }
-    });
-  }
-
-  renderMonthlyPnLChart() {
-    const canvas = document.getElementById('monthly-pnl-chart');
-    if (!canvas) return;
-    
-    const ctx = canvas.getContext('2d');
-    const monthlyData = this.calculateMonthlyPnL();
-
-    if (window.monthlyChart) {
-      window.monthlyChart.destroy();
-    }
-
-    window.monthlyChart = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: Object.keys(monthlyData),
-        datasets: [{
-          label: 'Monthly P&L (₹)',
-          data: Object.values(monthlyData),
-          backgroundColor: Object.values(monthlyData).map(val => val >= 0 ? '#10B981' : '#EF4444'),
-          borderColor: Object.values(monthlyData).map(val => val >= 0 ? '#059669' : '#DC2626'),
-          borderWidth: 1
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          title: {
-            display: true,
-            text: 'Monthly P&L Performance'
+            beginAtZero: false,
+            title: { display: true, text: 'Cumulative P&L (₹)' },
+            ticks: {
+              callback: function(value) {
+                return '₹' + value.toLocaleString();
+              }
+            }
           }
         },
-        scales: {
-          y: { 
-            beginAtZero: true,
-            title: { display: true, text: 'P&L (₹)' }
-          }
+        interaction: {
+          intersect: false,
+          mode: 'index'
         }
       }
     });
   }
 
-  renderWinLossChart() {
+  renderWinLossChart(trades) {
     const canvas = document.getElementById('winloss-chart');
-    if (!canvas) return;
+    if (!canvas) {
+      console.warn('Win/Loss chart canvas not found');
+      return;
+    }
     
     const ctx = canvas.getContext('2d');
-    const trades = this.data.trades.filter(t => t.status !== 'Open');
-    const wins = trades.filter(t => t.status === 'Win').length;
-    const losses = trades.filter(t => t.status === 'Loss').length;
+    const closedTrades = trades.filter(t => t.status !== 'Open');
+    const wins = closedTrades.filter(t => t.status === 'Win').length;
+    const losses = closedTrades.filter(t => t.status === 'Loss').length;
 
-    if (window.winLossChart) {
-      window.winLossChart.destroy();
+    if (this.charts.winLossChart) {
+      this.charts.winLossChart.destroy();
     }
 
-    window.winLossChart = new Chart(ctx, {
+    this.charts.winLossChart = new Chart(ctx, {
       type: 'doughnut',
       data: {
         labels: ['Wins', 'Losses'],
         datasets: [{
           data: [wins, losses],
-          backgroundColor: ['#10B981', '#EF4444'],
-          borderWidth: 2,
-          borderColor: '#FFFFFF'
+          backgroundColor: ['#1FB8CD', '#B4413C'],
+          borderWidth: 3,
+          borderColor: '#FFFFFF',
+          hoverOffset: 10
         }]
       },
       options: {
@@ -1137,37 +1315,50 @@ class TradingJournalPro {
         plugins: {
           title: {
             display: true,
-            text: 'Win/Loss Distribution'
+            text: 'Win/Loss Distribution',
+            font: { size: 16, weight: 'bold' }
           },
           legend: {
-            position: 'bottom'
+            position: 'bottom',
+            labels: {
+              padding: 20,
+              usePointStyle: true
+            }
           }
         }
       }
     });
   }
 
-  renderStrategyPerformanceChart() {
+  renderStrategyPerformanceChart(trades) {
     const canvas = document.getElementById('strategy-performance-chart');
-    if (!canvas) return;
+    if (!canvas) {
+      console.warn('Strategy performance chart canvas not found');
+      return;
+    }
     
     const ctx = canvas.getContext('2d');
-    const strategyData = this.calculateStrategyPerformance();
+    const strategyData = {};
+    
+    trades.filter(t => t.pnl !== undefined).forEach(trade => {
+      strategyData[trade.strategy] = (strategyData[trade.strategy] || 0) + trade.pnl;
+    });
 
-    if (window.strategyChart) {
-      window.strategyChart.destroy();
+    if (this.charts.strategyChart) {
+      this.charts.strategyChart.destroy();
     }
 
-    window.strategyChart = new Chart(ctx, {
+    this.charts.strategyChart = new Chart(ctx, {
       type: 'bar',
       data: {
         labels: Object.keys(strategyData),
         datasets: [{
           label: 'Strategy P&L (₹)',
           data: Object.values(strategyData),
-          backgroundColor: '#3B82F6',
-          borderColor: '#1E40AF',
-          borderWidth: 1
+          backgroundColor: ['#1FB8CD', '#FFC185', '#B4413C', '#ECEBD5', '#5D878F', '#DB4545'],
+          borderColor: ['#1FB8CD', '#FFC185', '#B4413C', '#ECEBD5', '#5D878F', '#DB4545'],
+          borderWidth: 2,
+          borderRadius: 4
         }]
       },
       options: {
@@ -1176,34 +1367,235 @@ class TradingJournalPro {
         plugins: {
           title: {
             display: true,
-            text: 'Strategy Performance'
+            text: 'P&L by Strategy',
+            font: { size: 16, weight: 'bold' }
+          },
+          legend: {
+            display: false
           }
         },
         scales: {
           y: { 
             beginAtZero: true,
-            title: { display: true, text: 'P&L (₹)' }
+            title: { display: true, text: 'P&L (₹)' },
+            ticks: {
+              callback: function(value) {
+                return '₹' + value.toLocaleString();
+              }
+            }
+          },
+          x: {
+            title: { display: true, text: 'Strategy' }
           }
         }
       }
     });
   }
 
-  calculateMonthlyPnL() {
+  renderMonthlyPnLChart(trades) {
+    const canvas = document.getElementById('monthly-pnl-chart');
+    if (!canvas) {
+      console.warn('Monthly P&L chart canvas not found');
+      return;
+    }
+    
+    const ctx = canvas.getContext('2d');
     const monthlyData = {};
-    this.data.trades.filter(t => t.pnl !== undefined).forEach(trade => {
+    
+    trades.filter(t => t.pnl !== undefined).forEach(trade => {
       const month = new Date(trade.exitDate || trade.entryDate).toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
       monthlyData[month] = (monthlyData[month] || 0) + trade.pnl;
     });
-    return monthlyData;
+
+    if (this.charts.monthlyChart) {
+      this.charts.monthlyChart.destroy();
+    }
+
+    this.charts.monthlyChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: Object.keys(monthlyData),
+        datasets: [{
+          label: 'Monthly P&L (₹)',
+          data: Object.values(monthlyData),
+          backgroundColor: Object.values(monthlyData).map(val => val >= 0 ? '#1FB8CD' : '#B4413C'),
+          borderColor: Object.values(monthlyData).map(val => val >= 0 ? '#1FB8CD' : '#B4413C'),
+          borderWidth: 2,
+          borderRadius: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          title: {
+            display: true,
+            text: 'Monthly Performance',
+            font: { size: 16, weight: 'bold' }
+          },
+          legend: {
+            display: false
+          }
+        },
+        scales: {
+          y: { 
+            beginAtZero: true,
+            title: { display: true, text: 'P&L (₹)' },
+            ticks: {
+              callback: function(value) {
+                return '₹' + value.toLocaleString();
+              }
+            }
+          },
+          x: {
+            title: { display: true, text: 'Month' }
+          }
+        }
+      }
+    });
   }
 
-  calculateStrategyPerformance() {
-    const strategyData = {};
-    this.data.trades.filter(t => t.pnl !== undefined).forEach(trade => {
-      strategyData[trade.strategy] = (strategyData[trade.strategy] || 0) + trade.pnl;
+  renderAnalyticsTables(trades) {
+    console.log('Rendering analytics tables...');
+    this.renderStrategyBreakdownTable(trades);
+    this.renderMonthlyPerformanceTable(trades);
+    this.renderBestWorstTradesTable(trades);
+  }
+
+  renderStrategyBreakdownTable(trades) {
+    const table = document.getElementById('strategy-breakdown-table');
+    if (!table) return;
+
+    const strategyStats = {};
+    
+    trades.forEach(trade => {
+      if (!strategyStats[trade.strategy]) {
+        strategyStats[trade.strategy] = {
+          totalTrades: 0,
+          wins: 0,
+          losses: 0,
+          totalPnL: 0,
+          totalInvestment: 0
+        };
+      }
+      
+      const stats = strategyStats[trade.strategy];
+      if (trade.status !== 'Open') {
+        stats.totalTrades++;
+        if (trade.status === 'Win') stats.wins++;
+        if (trade.status === 'Loss') stats.losses++;
+        stats.totalPnL += trade.pnl || 0;
+      }
+      stats.totalInvestment += trade.entryPrice * trade.quantity;
     });
-    return strategyData;
+
+    const strategyRows = Object.entries(strategyStats).map(([strategy, stats]) => {
+      const winRate = stats.totalTrades > 0 ? (stats.wins / stats.totalTrades * 100) : 0;
+      const roi = stats.totalInvestment > 0 ? (stats.totalPnL / stats.totalInvestment * 100) : 0;
+      
+      return `
+        <tr>
+          <td><strong>${strategy}</strong></td>
+          <td>${stats.totalTrades}</td>
+          <td>${stats.wins}</td>
+          <td>${stats.losses}</td>
+          <td>${winRate.toFixed(1)}%</td>
+          <td class="currency ${stats.totalPnL >= 0 ? 'positive' : 'negative'}">${this.formatCurrency(stats.totalPnL)}</td>
+          <td class="${roi >= 0 ? 'positive' : 'negative'}">${roi.toFixed(2)}%</td>
+        </tr>
+      `;
+    });
+
+    table.innerHTML = `
+      <thead>
+        <tr>
+          <th>Strategy</th><th>Total Trades</th><th>Wins</th><th>Losses</th>
+          <th>Win Rate</th><th>Total P&L</th><th>ROI</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${strategyRows.join('')}
+      </tbody>
+    `;
+  }
+
+  renderMonthlyPerformanceTable(trades) {
+    const table = document.getElementById('monthly-performance-table');
+    if (!table) return;
+
+    const monthlyStats = {};
+    
+    trades.filter(t => t.pnl !== undefined).forEach(trade => {
+      const month = new Date(trade.exitDate || trade.entryDate).toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
+      
+      if (!monthlyStats[month]) {
+        monthlyStats[month] = { trades: 0, wins: 0, pnl: 0 };
+      }
+      
+      monthlyStats[month].trades++;
+      if (trade.status === 'Win') monthlyStats[month].wins++;
+      monthlyStats[month].pnl += trade.pnl;
+    });
+
+    const monthlyRows = Object.entries(monthlyStats)
+      .sort((a, b) => new Date(a[0]) - new Date(b[0]))
+      .map(([month, stats]) => {
+        const winRate = stats.trades > 0 ? (stats.wins / stats.trades * 100) : 0;
+        
+        return `
+          <tr>
+            <td><strong>${month}</strong></td>
+            <td>${stats.trades}</td>
+            <td>${stats.wins}</td>
+            <td>${winRate.toFixed(1)}%</td>
+            <td class="currency ${stats.pnl >= 0 ? 'positive' : 'negative'}">${this.formatCurrency(stats.pnl)}</td>
+          </tr>
+        `;
+      });
+
+    table.innerHTML = `
+      <thead>
+        <tr>
+          <th>Month</th><th>Trades</th><th>Wins</th><th>Win Rate</th><th>P&L</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${monthlyRows.join('')}
+      </tbody>
+    `;
+  }
+
+  renderBestWorstTradesTable(trades) {
+    const table = document.getElementById('best-worst-trades-table');
+    if (!table) return;
+
+    const closedTrades = trades.filter(t => t.pnl !== undefined);
+    const sortedTrades = [...closedTrades].sort((a, b) => (b.pnl || 0) - (a.pnl || 0));
+    const bestTrades = sortedTrades.slice(0, 5);
+    const worstTrades = sortedTrades.slice(-5).reverse();
+
+    const tradeRows = [...bestTrades, ...worstTrades].map(trade => `
+      <tr>
+        <td><strong>${trade.symbol.replace('.NS', '')}</strong></td>
+        <td>${this.formatDate(trade.entryDate)}</td>
+        <td>${trade.strategy}</td>
+        <td class="currency">${this.formatCurrency(trade.entryPrice)}</td>
+        <td class="currency">${this.formatCurrency(trade.exitPrice)}</td>
+        <td class="currency ${trade.pnl >= 0 ? 'positive' : 'negative'}">${this.formatCurrency(trade.pnl)}</td>
+        <td class="${trade.pnlPercent >= 0 ? 'positive' : 'negative'}">${trade.pnlPercent.toFixed(2)}%</td>
+      </tr>
+    `);
+
+    table.innerHTML = `
+      <thead>
+        <tr>
+          <th>Symbol</th><th>Date</th><th>Strategy</th><th>Entry</th><th>Exit</th><th>P&L</th><th>%</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${tradeRows.join('')}
+      </tbody>
+    `;
   }
 
   calculateAdvancedMetrics() {
@@ -1241,26 +1633,6 @@ class TradingJournalPro {
     const sharpeRatio = (avgReturn / stdDev).toFixed(2);
 
     return { winRate, profitFactor, maxDrawdown: maxDrawdownPercent, sharpeRatio, avgWin, avgLoss };
-  }
-
-  renderAdvancedMetrics() {
-    const { winRate, profitFactor, maxDrawdown, sharpeRatio, avgWin, avgLoss } = this.calculateAdvancedMetrics();
-    
-    const elements = {
-      'win-rate': winRate + '%',
-      'profit-factor': profitFactor,
-      'max-drawdown': maxDrawdown + '%',
-      'sharpe-ratio': sharpeRatio,
-      'avg-win': '₹' + avgWin.toLocaleString(),
-      'avg-loss': '₹' + avgLoss.toLocaleString()
-    };
-
-    Object.entries(elements).forEach(([id, value]) => {
-      const element = document.getElementById(id);
-      if (element) {
-        element.textContent = value;
-      }
-    });
   }
 
   // News & AI
@@ -1396,85 +1768,46 @@ class TradingJournalPro {
     `).join('');
   }
 
-  // Live Prices & Updates - FIXED VERSION
-  initializeLivePrices() {
-    // Initialize with realistic mock prices for NSE stocks immediately
-    const basePrices = {
-      'RELIANCE.NS': 2450,
-      'TCS.NS': 3850,
-      'HDFCBANK.NS': 1650,
-      'ICICIBANK.NS': 1050,
-      'BHARTIARTL.NS': 890,
-      'SBIN.NS': 580,
-      'INFY.NS': 1720,
-      'LT.NS': 3450,
-      'ITC.NS': 425,
-      'HCLTECH.NS': 1380
-    };
-
-    // Set base prices for all NSE stocks
-    this.nseStocks.forEach(symbol => {
-      const basePrice = basePrices[symbol] || (Math.random() * 2000 + 100);
-      // Add realistic variance (+/- 5%)
-      const variance = (Math.random() - 0.5) * 0.1;
-      this.livePrices.set(symbol, basePrice * (1 + variance));
+  // Live Prices & Updates
+  startLivePriceUpdates() {
+    // Initialize with mock prices for common stocks
+    this.nseStocks.slice(0, 50).forEach(symbol => {
+      this.livePrices.set(symbol, Math.random() * 2000 + 500);
     });
 
-    console.log('Live prices initialized for', this.livePrices.size, 'stocks');
-  }
-
-  startLivePriceUpdates() {
-    // Update prices every 15 seconds with realistic movements
+    // Update prices every 10 seconds
     this.priceUpdateInterval = setInterval(() => {
-      this.updateLivePrices();
+      this.livePrices.forEach((price, symbol) => {
+        const change = (Math.random() - 0.5) * 50;
+        this.livePrices.set(symbol, Math.max(price + change, 10));
+      });
       
-      // Only update UI if user is viewing open trades
       if (this.activeTab === 'openTrades') {
         this.renderOpenTrades();
       }
-    }, 15000);
-  }
-
-  updateLivePrices() {
-    this.livePrices.forEach((price, symbol) => {
-      // Realistic price movement: +/- 0.5% to 2%
-      const volatility = Math.random() * 0.02; // 0-2%
-      const direction = Math.random() > 0.5 ? 1 : -1;
-      const change = price * volatility * direction;
-      const newPrice = Math.max(price + change, 10); // Minimum price of 10
-      this.livePrices.set(symbol, newPrice);
-    });
+    }, 10000);
   }
 
   getCurrentPrice(symbol) {
     if (!this.livePrices.has(symbol)) {
-      // Generate a realistic price if not found
-      const basePrice = Math.random() * 2000 + 100;
-      this.livePrices.set(symbol, basePrice);
+      this.livePrices.set(symbol, Math.random() * 2000 + 500);
     }
     return this.livePrices.get(symbol);
   }
 
   refreshPrices() {
-    // Update all prices immediately - NO SPINNER
-    this.updateLivePrices();
+    this.livePrices.forEach((price, symbol) => {
+      const change = (Math.random() - 0.5) * 100;
+      this.livePrices.set(symbol, Math.max(price + change, 10));
+    });
     
-    if (this.activeTab === 'openTrades') {
-      this.renderOpenTrades();
-    }
-    
+    this.renderOpenTrades();
     this.showMessage('Live prices updated successfully!', 'success');
   }
 
   refreshAllData() {
-    // Refresh everything immediately - NO SPINNER
-    this.updateLivePrices();
+    this.refreshPrices();
     this.updateLastRefreshTime();
-    
-    if (this.activeTab === 'openTrades') {
-      this.renderOpenTrades();
-    }
-    
     this.showMessage('All data refreshed successfully!', 'success');
   }
 
@@ -1495,7 +1828,56 @@ class TradingJournalPro {
     }
   }
 
-  // Import/Export Functions
+  // Utility Functions
+  formatCurrency(amount) {
+    if (isNaN(amount)) return '0.00';
+    return new Intl.NumberFormat('en-IN', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(amount);
+  }
+
+  formatDate(dateString) {
+    if (!dateString) return '-';
+    return new Date(dateString).toLocaleDateString('en-IN', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    });
+  }
+
+  formatTimeAgo(timestamp) {
+    const now = new Date();
+    const time = new Date(timestamp);
+    const diffMs = now - time;
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffMins = Math.floor(diffMs / (1000 * 60));
+    
+    if (diffHours >= 24) {
+      return Math.floor(diffHours / 24) + ' days ago';
+    } else if (diffHours >= 1) {
+      return diffHours + ' hours ago';
+    } else {
+      return diffMins + ' minutes ago';
+    }
+  }
+
+  showMessage(text, type = 'info') {
+    const container = document.getElementById('message-container');
+    if (!container) return;
+    
+    const message = document.createElement('div');
+    message.className = `message ${type}`;
+    message.textContent = text;
+    
+    container.appendChild(message);
+    
+    setTimeout(() => {
+      message.remove();
+    }, 5000);
+  }
+
+  // Import/Export Functions (abbreviated for space)
   exportAllData() {
     const exportData = {
       ...this.data,
@@ -1670,55 +2052,6 @@ class TradingJournalPro {
 
   filterNews() {
     this.showMessage('News filtered successfully!', 'info');
-  }
-
-  // Utility Functions
-  formatCurrency(amount) {
-    if (isNaN(amount)) return '0.00';
-    return new Intl.NumberFormat('en-IN', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }).format(amount);
-  }
-
-  formatDate(dateString) {
-    if (!dateString) return '-';
-    return new Date(dateString).toLocaleDateString('en-IN', {
-      day: '2-digit',
-      month: 'short',
-      year: 'numeric'
-    });
-  }
-
-  formatTimeAgo(timestamp) {
-    const now = new Date();
-    const time = new Date(timestamp);
-    const diffMs = now - time;
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-    const diffMins = Math.floor(diffMs / (1000 * 60));
-    
-    if (diffHours >= 24) {
-      return Math.floor(diffHours / 24) + ' days ago';
-    } else if (diffHours >= 1) {
-      return diffHours + ' hours ago';
-    } else {
-      return diffMins + ' minutes ago';
-    }
-  }
-
-  showMessage(text, type = 'info') {
-    const container = document.getElementById('message-container');
-    if (!container) return;
-    
-    const message = document.createElement('div');
-    message.className = `message ${type}`;
-    message.textContent = text;
-    
-    container.appendChild(message);
-    
-    setTimeout(() => {
-      message.remove();
-    }, 5000);
   }
 }
 

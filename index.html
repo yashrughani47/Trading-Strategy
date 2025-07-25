@@ -206,7 +206,7 @@
         <div class="open-trades-header">
           <h2>Open Positions</h2>
           <div class="open-trades-actions">
-            <button class="btn btn--primary" id="refresh-prices">🔄 Update Prices</button>
+            <button class="btn btn--primary" id="refresh-prices">🔄 Refresh Prices</button>
             <button class="btn btn--secondary" id="close-all-profitable">💰 Close All Profitable</button>
           </div>
         </div>
@@ -271,7 +271,7 @@
       <!-- Analytics -->
       <section id="tab-analytics" class="tab-section hidden">
         <div class="analytics-header">
-          <h2>Advanced Analytics</h2>
+          <h2>Professional Analytics Dashboard</h2>
           <div class="analytics-filters">
             <select class="form-control" id="analytics-account">
               <option value="">All Accounts</option>
@@ -279,65 +279,155 @@
             <select class="form-control" id="analytics-strategy">
               <option value="">All Strategies</option>
             </select>
-            <select class="form-control" id="analytics-period">
-              <option value="all">All Time</option>
-              <option value="30">Last 30 Days</option>
-              <option value="90">Last 90 Days</option>
-              <option value="365">Last Year</option>
+            <select class="form-control" id="analytics-result">
+              <option value="">All Results</option>
+              <option value="Win">Wins Only</option>
+              <option value="Loss">Losses Only</option>
             </select>
+            <input type="date" class="form-control" id="analytics-date-from" placeholder="From Date" />
+            <input type="date" class="form-control" id="analytics-date-to" placeholder="To Date" />
+            <button class="btn btn--primary" id="apply-analytics-filters">Apply Filters</button>
           </div>
         </div>
 
-        <div class="analytics-grid">
-          <div class="analytics-card">
+        <!-- Key Performance Metrics Cards -->
+        <div class="kpi-cards-grid">
+          <div class="kpi-card total-pnl">
+            <div class="kpi-header">
+              <h4>Total P&L</h4>
+              <span class="kpi-icon">💰</span>
+            </div>
+            <div class="kpi-value" id="kpi-total-pnl">₹0</div>
+            <div class="kpi-change" id="kpi-total-pnl-change">0%</div>
+          </div>
+
+          <div class="kpi-card win-rate">
+            <div class="kpi-header">
+              <h4>Win Rate</h4>
+              <span class="kpi-icon">🎯</span>
+            </div>
+            <div class="kpi-value" id="kpi-win-rate">0%</div>
+            <div class="kpi-progress">
+              <div class="progress-bar" id="win-rate-progress"></div>
+            </div>
+          </div>
+
+          <div class="kpi-card total-trades">
+            <div class="kpi-header">
+              <h4>Total Trades</h4>
+              <span class="kpi-icon">📊</span>
+            </div>
+            <div class="kpi-value" id="kpi-total-trades">0</div>
+            <div class="kpi-subtitle" id="kpi-trades-breakdown">0 W | 0 L</div>
+          </div>
+
+          <div class="kpi-card profit-factor">
+            <div class="kpi-header">
+              <h4>Profit Factor</h4>
+              <span class="kpi-icon">⚡</span>
+            </div>
+            <div class="kpi-value" id="kpi-profit-factor">0.00</div>
+            <div class="kpi-subtitle">Wins / Losses</div>
+          </div>
+
+          <div class="kpi-card sharpe-ratio">
+            <div class="kpi-header">
+              <h4>Sharpe Ratio</h4>
+              <span class="kpi-icon">📈</span>
+            </div>
+            <div class="kpi-value" id="kpi-sharpe-ratio">0.00</div>
+            <div class="kpi-subtitle">Risk Adjusted</div>
+          </div>
+
+          <div class="kpi-card max-drawdown">
+            <div class="kpi-header">
+              <h4>Max Drawdown</h4>
+              <span class="kpi-icon">📉</span>
+            </div>
+            <div class="kpi-value" id="kpi-max-drawdown">0%</div>
+            <div class="kpi-subtitle">Peak to Trough</div>
+          </div>
+
+          <div class="kpi-card avg-pnl-trade">
+            <div class="kpi-header">
+              <h4>Avg P&L per Trade</h4>
+              <span class="kpi-icon">💸</span>
+            </div>
+            <div class="kpi-value" id="kpi-avg-pnl">₹0</div>
+            <div class="kpi-subtitle">Per Position</div>
+          </div>
+
+          <div class="kpi-card risk-reward">
+            <div class="kpi-header">
+              <h4>Risk-Reward Ratio</h4>
+              <span class="kpi-icon">⚖️</span>
+            </div>
+            <div class="kpi-value" id="kpi-risk-reward">1:0</div>
+            <div class="kpi-subtitle">Avg Win : Avg Loss</div>
+          </div>
+
+          <div class="kpi-card expectancy">
+            <div class="kpi-header">
+              <h4>Expectancy</h4>
+              <span class="kpi-icon">🔮</span>
+            </div>
+            <div class="kpi-value" id="kpi-expectancy">₹0</div>
+            <div class="kpi-subtitle">Mathematical Edge</div>
+          </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="charts-grid">
+          <div class="chart-card">
+            <h3>Equity Curve</h3>
             <div class="chart-container" style="position: relative; height: 400px;">
               <canvas id="equity-chart"></canvas>
             </div>
           </div>
 
-          <div class="analytics-card">
+          <div class="chart-card">
+            <h3>Win/Loss Distribution</h3>
             <div class="chart-container" style="position: relative; height: 400px;">
-              <canvas id="monthly-pnl-chart"></canvas>
-            </div>
-          </div>
-
-          <div class="analytics-card">
-            <div class="chart-container" style="position: relative; height: 300px;">
               <canvas id="winloss-chart"></canvas>
             </div>
           </div>
 
-          <div class="analytics-card">
-            <div class="chart-container" style="position: relative; height: 300px;">
+          <div class="chart-card">
+            <h3>P&L by Strategy</h3>
+            <div class="chart-container" style="position: relative; height: 400px;">
               <canvas id="strategy-performance-chart"></canvas>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <h3>Monthly Performance</h3>
+            <div class="chart-container" style="position: relative; height: 400px;">
+              <canvas id="monthly-pnl-chart"></canvas>
             </div>
           </div>
         </div>
 
-        <div class="metrics-grid">
-          <div class="metric-card">
-            <h4>Win Rate</h4>
-            <div class="metric-value" id="win-rate">0%</div>
+        <!-- Advanced Analytics Tables -->
+        <div class="analytics-tables">
+          <div class="analytics-table-card">
+            <h3>Strategy Performance Breakdown</h3>
+            <div class="table-container">
+              <table class="table" id="strategy-breakdown-table"></table>
+            </div>
           </div>
-          <div class="metric-card">
-            <h4>Profit Factor</h4>
-            <div class="metric-value" id="profit-factor">0.00</div>
+
+          <div class="analytics-table-card">
+            <h3>Monthly Performance Summary</h3>
+            <div class="table-container">
+              <table class="table" id="monthly-performance-table"></table>
+            </div>
           </div>
-          <div class="metric-card">
-            <h4>Max Drawdown</h4>
-            <div class="metric-value" id="max-drawdown">0%</div>
-          </div>
-          <div class="metric-card">
-            <h4>Sharpe Ratio</h4>
-            <div class="metric-value" id="sharpe-ratio">0.00</div>
-          </div>
-          <div class="metric-card">
-            <h4>Avg Win</h4>
-            <div class="metric-value" id="avg-win">₹0</div>
-          </div>
-          <div class="metric-card">
-            <h4>Avg Loss</h4>
-            <div class="metric-value" id="avg-loss">₹0</div>
+
+          <div class="analytics-table-card">
+            <h3>Best & Worst Performing Trades</h3>
+            <div class="table-container">
+              <table class="table" id="best-worst-trades-table"></table>
+            </div>
           </div>
         </div>
       </section>
