@@ -1,55 +1,231 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Chartink Strategy Builder</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trading Journal Dashboard</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+  <script src="app.js" defer></script>
 </head>
-
 <body>
-  <header>
-    <h1>Chartink Strategy Builder</h1>
-    <p class="tagline">Drag-and-drop filters &nbsp;•&nbsp; Natural-language assist &nbsp;•&nbsp; Live scan preview</p>
+  <header class="header container">
+    <h1>Trading Journal</h1>
   </header>
+  <nav class="tabs container" role="tablist">
+    <button class="tab-link active" data-tab="dashboard" role="tab" aria-selected="true">Dashboard</button>
+    <button class="tab-link" data-tab="trades" role="tab" aria-selected="false">Trades</button>
+    <button class="tab-link" data-tab="all-trades" role="tab" aria-selected="false">All Trades</button>
+    <button class="tab-link" data-tab="analytics" role="tab" aria-selected="false">Analytics</button>
+  </nav>
 
-  <!-- Natural-language assist bar -->
-  <section id="assist">
-    <input id="nl-input" type="text" placeholder="e.g. weekly RSI above 60 and close crosses 200 SMA">
-    <button id="nl-btn">Convert&nbsp;↵</button>
-  </section>
+  <main class="container">
+    <!-- Dashboard TAB -->
+    <section id="tab-dashboard" class="tab-panel" role="tabpanel">
+      <div class="flex flex-col gap-16">
+        <!-- Accounts -->
+        <div class="card">
+          <header class="card__header flex justify-between items-center">
+            <h2>Accounts</h2>
+            <form id="account-form" class="flex gap-8" autocomplete="off">
+              <input id="account-name" class="form-control" type="text" placeholder="Name" required />
+              <input id="account-balance" class="form-control" type="number" placeholder="Balance" min="0" step="0.01" required />
+              <button id="account-submit" type="submit" class="btn btn--primary btn--sm">Add</button>
+            </form>
+          </header>
+          <div class="card__body">
+            <div class="table-wrap">
+              <table id="accounts-table" class="data-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Balance</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
 
-  <!-- Builder + preview grid -->
-  <main class="grid">
-    <!-- Filter builder -->
-    <section id="builder">
-      <h2>Filters</h2>
-      <ul id="filter-list"></ul>
-      <div class="builder-actions">
-        <button id="add-condition">+ Condition</button>
-        <button id="add-group">+ Group (AND/OR)</button>
+        <!-- Strategies -->
+        <div class="card">
+          <header class="card__header flex justify-between items-center">
+            <h2>Strategies</h2>
+            <form id="strategy-form" class="flex gap-8" autocomplete="off">
+              <input id="strategy-name" class="form-control" type="text" placeholder="Name" required />
+              <button id="strategy-submit" type="submit" class="btn btn--primary btn--sm">Add</button>
+            </form>
+          </header>
+          <div class="card__body">
+            <div class="table-wrap">
+              <table id="strategies-table" class="data-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
-    <!-- Live syntax preview -->
-    <section id="preview">
-      <h2>Chartink scan_clause</h2>
-      <pre id="syntax"></pre>
-      <button id="copy">Copy&nbsp;to&nbsp;Clipboard</button>
+    <!-- Trades TAB -->
+    <section id="tab-trades" class="tab-panel hidden" role="tabpanel">
+      <div class="card">
+        <header class="card__header">
+          <h2>Add Trade</h2>
+        </header>
+        <div class="card__body">
+          <form id="trade-form" class="grid-form" autocomplete="off">
+            <div class="form-group">
+              <label class="form-label" for="entry-date">Entry Date</label>
+              <input id="entry-date" class="form-control" type="date" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="entry-price">Entry Price</label>
+              <input id="entry-price" class="form-control" type="number" step="0.0001" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="stop-loss">Stop&nbsp;Loss</label>
+              <input id="stop-loss" class="form-control" type="number" step="0.0001" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="target">Target</label>
+              <input id="target" class="form-control" type="number" step="0.0001" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="exit-date">Exit Date</label>
+              <input id="exit-date" class="form-control" type="date" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="exit-price">Exit Price</label>
+              <input id="exit-price" class="form-control" type="number" step="0.0001" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="side">Side</label>
+              <select id="side" class="form-control" required>
+                <option value="long">Long (Buy)</option>
+                <option value="short">Short (Sell)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="trade-strategy">Strategy</label>
+              <select id="trade-strategy" class="form-control" required></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="trade-account">Account</label>
+              <select id="trade-account" class="form-control" required></select>
+            </div>
+            <button id="trade-submit" type="submit" class="btn btn--primary btn--sm">Save Trade</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="filters-bar flex gap-8 my-8">
+        <select id="filter-account" class="form-control"></select>
+        <select id="filter-strategy" class="form-control"></select>
+        <select id="filter-outcome" class="form-control">
+          <option value="all">All</option>
+          <option value="win">Win</option>
+          <option value="loss">Loss</option>
+        </select>
+      </div>
+
+      <div class="table-wrap">
+        <table id="trades-table" class="data-table">
+          <thead>
+            <tr>
+              <th>Account</th>
+              <th>Strategy</th>
+              <th>Side</th>
+              <th>Entry Date</th>
+              <th>Entry</th>
+              <th>Stop</th>
+              <th>Target</th>
+              <th>R:R</th>
+              <th>Exit Date</th>
+              <th>Exit</th>
+              <th>P&L</th>
+              <th>Outcome</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- All Trades TAB -->
+    <section id="tab-all-trades" class="tab-panel hidden" role="tabpanel">
+      <div class="flex justify-between items-center my-8">
+        <div class="flex gap-8">
+          <select id="all-filter-account" class="form-control"></select>
+          <select id="all-filter-strategy" class="form-control"></select>
+          <select id="all-filter-outcome" class="form-control">
+            <option value="all">All</option>
+            <option value="win">Win</option>
+            <option value="loss">Loss</option>
+          </select>
+        </div>
+        <div class="flex gap-8">
+          <button id="export-csv" class="btn btn--secondary btn--sm">Export CSV</button>
+          <input id="import-csv-input" type="file" accept="text/csv" class="hidden" />
+          <button id="import-csv-btn" class="btn btn--secondary btn--sm">Import CSV</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table id="all-trades-table" class="data-table">
+          <thead></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Analytics TAB -->
+    <section id="tab-analytics" class="tab-panel hidden" role="tabpanel">
+      <div class="filters-bar flex gap-8 my-8">
+        <select id="analytics-filter-account" class="form-control"></select>
+        <select id="analytics-filter-strategy" class="form-control"></select>
+        <select id="analytics-filter-outcome" class="form-control">
+          <option value="all">All</option>
+          <option value="win">Win</option>
+          <option value="loss">Loss</option>
+        </select>
+      </div>
+
+      <div id="metrics-grid" class="metrics-grid mb-8"></div>
+
+      <div class="charts-grid">
+        <div class="chart-card">
+          <h3>Equity Curve</h3>
+          <div class="chart-container" style="position: relative; height: 300px;">
+            <canvas id="equity-chart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <h3>Win vs Loss</h3>
+          <div class="chart-container" style="position: relative; height: 300px;">
+            <canvas id="winloss-chart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card full-width">
+          <h3>P&L by Strategy</h3>
+          <div class="chart-container" style="position: relative; height: 300px;">
+            <canvas id="strategy-chart"></canvas>
+          </div>
+        </div>
+      </div>
     </section>
   </main>
 
-  <!-- Import / Export -->
-  <section id="io">
-    <input id="file-input" type="file" accept=".json" hidden>
-    <button id="export-json">Export JSON</button>
-    <button id="import-json">Import JSON</button>
-  </section>
-
-  <footer>
-    <small>© 2025 Strategy Builder – compatible with <a href="https://chartink.com" target="_blank" rel="noopener">Chartink</a></small>
-  </footer>
-
-  <script src="app.js"></script>
+  <!-- Tiny toast area -->
+  <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
 </body>
 </html>
