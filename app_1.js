@@ -1,5 +1,5 @@
 // Trading Journal Pro - Ultimate NSE Platform
-// Fixed version with proper navigation and functionality
+// Fixed version with WORKING tab navigation and NO spinning loaders
 
 class TradingJournalPro {
   constructor() {
@@ -61,6 +61,9 @@ class TradingJournalPro {
       "Consider profit booking in overweight positions above 10% allocation",
       "Recent market sentiment suggests cautious approach to new positions"
     ];
+    
+    // Bind methods to preserve 'this' context
+    this.handleTabClick = this.handleTabClick.bind(this);
   }
 
   init() {
@@ -77,10 +80,58 @@ class TradingJournalPro {
     this.loadData();
     this.setupEventListeners();
     this.initStockAutocomplete();
+    this.initializeLivePrices(); // Initialize prices immediately
     this.startLivePriceUpdates();
     this.updateLastRefreshTime();
     this.renderActiveTab();
     console.log('Trading Journal Pro initialized successfully');
+  }
+
+  // FIXED Tab Navigation
+  handleTabClick(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const tabElement = e.currentTarget;
+    const tabName = tabElement.dataset.tab;
+    
+    console.log('Tab clicked:', tabName);
+    
+    if (tabName) {
+      this.switchTab(tabName);
+    }
+  }
+
+  switchTab(tabName) {
+    console.log('Switching to tab:', tabName);
+    
+    // Update active tab visual state
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.classList.remove('active');
+    });
+    
+    const activeTabElement = document.querySelector(`[data-tab="${tabName}"]`);
+    if (activeTabElement) {
+      activeTabElement.classList.add('active');
+    }
+    
+    // Show/hide sections
+    document.querySelectorAll('.tab-section').forEach(section => {
+      section.classList.add('hidden');
+    });
+    
+    const targetSection = document.getElementById(`tab-${tabName}`);
+    if (targetSection) {
+      targetSection.classList.remove('hidden');
+      console.log(`Tab section ${tabName} shown`);
+    } else {
+      console.error(`Tab section tab-${tabName} not found`);
+    }
+    
+    this.activeTab = tabName;
+    
+    // Render the active tab content
+    this.renderActiveTab();
   }
 
   // Data Management
@@ -155,21 +206,13 @@ class TradingJournalPro {
     }
   }
 
-  // Event Listeners
+  // Event Listeners - FIXED VERSION
   setupEventListeners() {
     console.log('Setting up event listeners...');
     
-    // Tab switching - Fixed to work properly
+    // FIXED Tab switching with proper event binding
     document.querySelectorAll('.tab').forEach(tab => {
-      tab.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        const tabElement = e.target.closest('.tab');
-        if (tabElement && tabElement.dataset.tab) {
-          console.log('Tab clicked:', tabElement.dataset.tab);
-          this.switchTab(tabElement.dataset.tab);
-        }
-      });
+      tab.addEventListener('click', this.handleTabClick);
     });
 
     // Header actions
@@ -229,40 +272,6 @@ class TradingJournalPro {
     } else {
       console.warn(`Element with id '${elementId}' not found`);
     }
-  }
-
-  switchTab(tabName) {
-    console.log('Switching to tab:', tabName);
-    
-    // Update active tab visual state
-    document.querySelectorAll('.tab').forEach(tab => {
-      tab.classList.remove('active');
-    });
-    
-    const activeTabElement = document.querySelector(`[data-tab="${tabName}"]`);
-    if (activeTabElement) {
-      activeTabElement.classList.add('active');
-    }
-    
-    // Show/hide sections
-    document.querySelectorAll('.tab-section').forEach(section => {
-      section.classList.add('hidden');
-    });
-    
-    const targetSection = document.getElementById(`tab-${tabName}`);
-    if (targetSection) {
-      targetSection.classList.remove('hidden');
-      console.log(`Tab section ${tabName} shown`);
-    } else {
-      console.error(`Tab section tab-${tabName} not found`);
-    }
-    
-    this.activeTab = tabName;
-    
-    // Small delay to ensure DOM is updated before rendering
-    setTimeout(() => {
-      this.renderActiveTab();
-    }, 50);
   }
 
   renderActiveTab() {
@@ -562,6 +571,9 @@ class TradingJournalPro {
     if (entryDateInput) {
       entryDateInput.value = new Date().toISOString().split('T')[0];
     }
+    
+    // Initialize calculator
+    this.calculateRisk();
   }
 
   calculateRisk() {
@@ -660,10 +672,7 @@ class TradingJournalPro {
     this.showMessage('Trade added successfully!', 'success');
     
     // Reset calculator
-    const calculator = document.getElementById('risk-calculator');
-    if (calculator) {
-      calculator.innerHTML = '<p>Enter trade details to see risk calculations</p>';
-    }
+    this.calculateRisk();
   }
 
   // Open Trades
@@ -764,7 +773,7 @@ class TradingJournalPro {
         <div class="value positive">${profitable.length} of ${openTrades.length}</div>
       </div>
       <div class="analytics-item">
-        <h4>Success Rate</h4>
+        <h4>Success Rate</h4> 
         <div class="value">${openTrades.length > 0 ? ((profitable.length / openTrades.length) * 100).toFixed(1) : 0}%</div>
       </div>
       <div class="analytics-item">
@@ -1387,57 +1396,86 @@ class TradingJournalPro {
     `).join('');
   }
 
-  // Live Prices & Updates
-  startLivePriceUpdates() {
-    // Initialize with mock prices for common stocks
-    this.nseStocks.slice(0, 50).forEach(symbol => {
-      this.livePrices.set(symbol, Math.random() * 2000 + 500);
+  // Live Prices & Updates - FIXED VERSION
+  initializeLivePrices() {
+    // Initialize with realistic mock prices for NSE stocks immediately
+    const basePrices = {
+      'RELIANCE.NS': 2450,
+      'TCS.NS': 3850,
+      'HDFCBANK.NS': 1650,
+      'ICICIBANK.NS': 1050,
+      'BHARTIARTL.NS': 890,
+      'SBIN.NS': 580,
+      'INFY.NS': 1720,
+      'LT.NS': 3450,
+      'ITC.NS': 425,
+      'HCLTECH.NS': 1380
+    };
+
+    // Set base prices for all NSE stocks
+    this.nseStocks.forEach(symbol => {
+      const basePrice = basePrices[symbol] || (Math.random() * 2000 + 100);
+      // Add realistic variance (+/- 5%)
+      const variance = (Math.random() - 0.5) * 0.1;
+      this.livePrices.set(symbol, basePrice * (1 + variance));
     });
 
-    // Update prices every 10 seconds
+    console.log('Live prices initialized for', this.livePrices.size, 'stocks');
+  }
+
+  startLivePriceUpdates() {
+    // Update prices every 15 seconds with realistic movements
     this.priceUpdateInterval = setInterval(() => {
-      this.livePrices.forEach((price, symbol) => {
-        const change = (Math.random() - 0.5) * 50;
-        this.livePrices.set(symbol, Math.max(price + change, 10));
-      });
+      this.updateLivePrices();
       
+      // Only update UI if user is viewing open trades
       if (this.activeTab === 'openTrades') {
         this.renderOpenTrades();
       }
-    }, 10000);
+    }, 15000);
+  }
+
+  updateLivePrices() {
+    this.livePrices.forEach((price, symbol) => {
+      // Realistic price movement: +/- 0.5% to 2%
+      const volatility = Math.random() * 0.02; // 0-2%
+      const direction = Math.random() > 0.5 ? 1 : -1;
+      const change = price * volatility * direction;
+      const newPrice = Math.max(price + change, 10); // Minimum price of 10
+      this.livePrices.set(symbol, newPrice);
+    });
   }
 
   getCurrentPrice(symbol) {
     if (!this.livePrices.has(symbol)) {
-      this.livePrices.set(symbol, Math.random() * 2000 + 500);
+      // Generate a realistic price if not found
+      const basePrice = Math.random() * 2000 + 100;
+      this.livePrices.set(symbol, basePrice);
     }
     return this.livePrices.get(symbol);
   }
 
   refreshPrices() {
-    this.showLoadingOverlay('Refreshing live prices...');
+    // Update all prices immediately - NO SPINNER
+    this.updateLivePrices();
     
-    setTimeout(() => {
-      this.livePrices.forEach((price, symbol) => {
-        const change = (Math.random() - 0.5) * 100;
-        this.livePrices.set(symbol, Math.max(price + change, 10));
-      });
-      
-      this.hideLoadingOverlay();
+    if (this.activeTab === 'openTrades') {
       this.renderOpenTrades();
-      this.showMessage('Live prices updated successfully!', 'success');
-    }, 2000);
+    }
+    
+    this.showMessage('Live prices updated successfully!', 'success');
   }
 
   refreshAllData() {
-    this.showLoadingOverlay('Refreshing market data and updating positions...');
+    // Refresh everything immediately - NO SPINNER
+    this.updateLivePrices();
+    this.updateLastRefreshTime();
     
-    setTimeout(() => {
-      this.refreshPrices();
-      this.updateLastRefreshTime();
-      this.hideLoadingOverlay();
-      this.showMessage('All data refreshed successfully!', 'success');
-    }, 3000);
+    if (this.activeTab === 'openTrades') {
+      this.renderOpenTrades();
+    }
+    
+    this.showMessage('All data refreshed successfully!', 'success');
   }
 
   updateLastRefreshTime() {
@@ -1681,21 +1719,6 @@ class TradingJournalPro {
     setTimeout(() => {
       message.remove();
     }, 5000);
-  }
-
-  showLoadingOverlay(text = 'Loading...') {
-    const overlay = document.getElementById('loading-overlay');
-    if (overlay) {
-      overlay.querySelector('p').textContent = text;
-      overlay.classList.remove('hidden');
-    }
-  }
-
-  hideLoadingOverlay() {
-    const overlay = document.getElementById('loading-overlay');
-    if (overlay) {
-      overlay.classList.add('hidden');
-    }
   }
 }
 

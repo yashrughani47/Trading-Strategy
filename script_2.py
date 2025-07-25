@@ -1,4 +1,5 @@
-// Trading Journal Pro - Fixed JavaScript
+# 3. Create app.js with core functionality and no spinning loaders
+js_content = '''// Trading Journal Pro - Fixed JavaScript
 
 // Utility Functions
 const $ = selector => document.querySelector(selector);
@@ -319,8 +320,7 @@ const App = {
         }
     },
     importCSV(csv) {
-        const lines = csv.split('
-');
+        const lines = csv.split('\n');
         const headers = lines[0].split(',').map(h => h.trim());
         for (let i = 1; i < lines.length; i++) {
             const cols = lines[i].split(',').map(c => c.trim());
@@ -350,10 +350,8 @@ const App = {
     },
     exportCSV() {
         const headers = ['symbol','entryDate','buyPrice','stopLoss','target','exitDate','exitPrice','orderType','strategy','account'];
-        const rows = this.data.trades.map(t => headers.map(h => t[h]).join(',')).join('
-');
-        return `${headers.join(',')}
-${rows}`;
+        const rows = this.data.trades.map(t => headers.map(h => t[h]).join(',')).join('\n');
+        return `${headers.join(',')}\n${rows}`;
     }
 };
 
@@ -370,3 +368,9 @@ window.addEventListener('click', e => {
     }
 });
 
+'''
+
+with open('app.js', 'w', encoding='utf-8') as f:
+    f.write(js_content)
+
+print("✅ app.js created successfully")

@@ -1,4 +1,8 @@
-<!DOCTYPE html>
+# Let me create the three files again with a completely simplified and working version
+# This will focus on core functionality without any complex async operations that could cause hanging
+
+# 1. Create index.html
+html_content = '''<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -12,7 +16,7 @@
             <h1>Trading Journal Pro</h1>
             <p class="subtitle">Ultimate NSE Trading Platform - Fixed Version</p>
         </header>
-
+        
         <nav class="tab-nav">
             <button class="tab-btn active" data-tab="dashboard">📊 Dashboard</button>
             <button class="tab-btn" data-tab="settings">⚙️ Settings</button>
@@ -44,7 +48,7 @@
                         <div class="stat-value" id="total-pnl">₹0</div>
                     </div>
                 </div>
-
+                
                 <div class="accounts-overview">
                     <h3>Accounts Overview</h3>
                     <div id="accounts-list"></div>
@@ -62,7 +66,7 @@
                     </div>
                     <div id="accounts-table"></div>
                 </div>
-
+                
                 <div class="settings-section">
                     <h3>Strategy Management</h3>
                     <div class="form-group">
@@ -117,7 +121,7 @@
                         <button id="delete-selected" class="btn btn-danger">🗑️ Delete Selected</button>
                     </div>
                 </div>
-
+                
                 <div class="filters">
                     <select id="filter-account">
                         <option value="">All Accounts</option>
@@ -131,7 +135,7 @@
                         <option value="loss">Losses Only</option>
                     </select>
                 </div>
-
+                
                 <div id="all-trades-table"></div>
             </div>
 
@@ -145,7 +149,7 @@
                         <canvas id="win-loss-chart"></canvas>
                     </div>
                 </div>
-
+                
                 <div class="metrics-grid">
                     <div class="metric-card">
                         <h4>Win Rate</h4>
@@ -172,7 +176,7 @@
                     <h3>AI Trading Insights</h3>
                     <div id="ai-insights-content"></div>
                 </div>
-
+                
                 <div class="trading-tips">
                     <h3>Trading Tips</h3>
                     <div id="trading-tips-content"></div>
@@ -183,4 +187,10 @@
 
     <script src="app.js"></script>
 </body>
-</html>
+</html>'''
+
+# Save to file
+with open('index.html', 'w', encoding='utf-8') as f:
+    f.write(html_content)
+
+print("✅ index.html created successfully")
