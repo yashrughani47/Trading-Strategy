@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chartink Strategy Builder</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <header>
+    <h1>Chartink Strategy Builder</h1>
+    <p class="tagline">Drag-and-drop filters &nbsp;•&nbsp; Natural-language assist &nbsp;•&nbsp; Live scan preview</p>
+  </header>
+
+  <!-- Natural-language assist bar -->
+  <section id="assist">
+    <input id="nl-input" type="text" placeholder="e.g. weekly RSI above 60 and close crosses 200 SMA">
+    <button id="nl-btn">Convert&nbsp;↵</button>
+  </section>
+
+  <!-- Builder + preview grid -->
+  <main class="grid">
+    <!-- Filter builder -->
+    <section id="builder">
+      <h2>Filters</h2>
+      <ul id="filter-list"></ul>
+      <div class="builder-actions">
+        <button id="add-condition">+ Condition</button>
+        <button id="add-group">+ Group (AND/OR)</button>
+      </div>
+    </section>
+
+    <!-- Live syntax preview -->
+    <section id="preview">
+      <h2>Chartink scan_clause</h2>
+      <pre id="syntax"></pre>
+      <button id="copy">Copy&nbsp;to&nbsp;Clipboard</button>
+    </section>
+  </main>
+
+  <!-- Import / Export -->
+  <section id="io">
+    <input id="file-input" type="file" accept=".json" hidden>
+    <button id="export-json">Export JSON</button>
+    <button id="import-json">Import JSON</button>
+  </section>
+
+  <footer>
+    <small>© 2025 Strategy Builder – compatible with <a href="https://chartink.com" target="_blank" rel="noopener">Chartink</a></small>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

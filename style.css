@@ -1,0 +1,51 @@
+/* ─── Global theme ─────────────────────────────────────────────── */
+:root {
+  --bg: #0e1117;
+  --panel: #161b22;
+  --accent: #1f6feb;
+  --text: #e6edf3;
+  --subtle: #8b949e;
+  font-size: 16px;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body        { background: var(--bg); color: var(--text); line-height: 1.45; }
+header,footer,section { padding: 1.2rem 1rem; }
+h1          { font-size: 1.65rem; margin-bottom: .25rem; }
+h2          { font-size: 1.1rem; margin-bottom: .75rem; }
+.tagline    { color: var(--subtle); }
+
+a           { color: var(--accent); text-decoration: none; }
+button      { cursor: pointer; border: 0; padding: .45rem .85rem;
+              background: var(--accent); color: #fff; border-radius: 4px; transition: .15s; }
+button:hover{ filter: brightness(1.08);} 
+input[type="text"] { flex: 1; padding: .5rem .6rem; border-radius: 4px;
+                     border: 1px solid #30363d; background: var(--panel); color: var(--text); }
+
+/* ─── Layout ───────────────────────────────────────────────────── */
+#assist     { display: flex; gap: .5rem; }
+.grid       { display: grid; gap: 1rem; padding: 1rem; }
+@media (min-width: 840px) { .grid { grid-template-columns: 1fr 1fr; } }
+
+#builder,#preview { background: var(--panel); border-radius: 6px; padding: 1rem; }
+
+ul#filter-list { list-style: none; display: flex; flex-direction: column; gap: .5rem; }
+.filter-row,
+.group-row   { background:#21262d;border:1px solid #30363d;padding:.6rem;border-radius:4px;
+              display:flex;align-items:center;gap:.5rem;flex-wrap:wrap; }
+.filter-row select,
+.filter-row input[type="number"]{ background:#0d1117;color:#c9d1d9;border:1px solid #30363d;
+                                  border-radius:4px;padding:.25rem .4rem; }
+.remove     { background:#8b949e;color:#0e1117;padding:.2rem .5rem;font-size:.8rem; }
+
+.builder-actions{ margin-top:.8rem; display:flex; gap:.6rem; }
+#syntax     { white-space: pre-wrap; word-break: break-word; background: #0d1117; padding: .8rem;
+              border-radius:4px; min-height: 6rem; border:1px solid #30363d; }
+
+#io         { display:flex; gap:.7rem; justify-content:center; padding-bottom:2rem; }
+
+footer      { text-align:center; color:var(--subtle); font-size:.85rem; }
+
+/* ─── Buttons inside preview & groups ─────────────────────────── */
+.group-logic{ background:#1f6feb;padding:.25rem .5rem;border-radius:4px;color:#fff;font-size:.75rem; }
