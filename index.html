@@ -179,8 +179,8 @@
                                 <label class="form-label">Order Type</label>
                                 <select class="form-control" id="orderType" required>
                                     <option value="">Select Type</option>
-                                    <option value="Long">Long</option>
-                                    <option value="Short">Short</option>
+                                    <option value="Buy">Buy</option>
+                                    <option value="Sell">Sell</option>
                                 </select>
                             </div>
 
@@ -190,8 +190,8 @@
                             </div>
 
                             <div class="form-group">
-                                <label class="form-label">Buy Price</label>
-                                <input type="number" class="form-control" id="buyPrice" placeholder="0.00" step="0.01" required>
+                                <label class="form-label">Entry Price</label>
+                                <input type="number" class="form-control" id="entryPrice" placeholder="0.00" step="0.01" required>
                             </div>
 
                             <div class="form-group">
@@ -286,12 +286,14 @@
                                     <th>Symbol</th>
                                     <th>Type</th>
                                     <th>Entry Date</th>
-                                    <th>Buy Price</th>
+                                    <th>Entry Price</th>
                                     <th>Quantity</th>
                                     <th>Investment</th>
-                                    <th>Current Price</th>
+                                    <th>Exit Price</th>
                                     <th>P&L</th>
                                     <th>Status</th>
+                                    <th>Strategy</th>
+                                    <th>Account</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -308,6 +310,112 @@
                     <div class="tab-subtitle">Performance insights and metrics</div>
                 </div>
                 
+                <!-- Analytics Filters -->
+                <div class="glass-card analytics-filters">
+                    <div class="card-header">
+                        <h3>Filters</h3>
+                        <button class="btn-secondary" id="clearFilters">
+                            <i class="fas fa-times"></i>
+                            Clear All
+                        </button>
+                    </div>
+                    <div class="filters-grid">
+                        <div class="form-group">
+                            <label class="form-label">Strategy</label>
+                            <select class="form-control" id="strategyFilter">
+                                <option value="">All Strategies</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Account</label>
+                            <select class="form-control" id="accountFilter">
+                                <option value="">All Accounts</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Outcome</label>
+                            <select class="form-control" id="outcomeFilter">
+                                <option value="">All Trades</option>
+                                <option value="win">Wins Only</option>
+                                <option value="loss">Losses Only</option>
+                                <option value="breakeven">Break Even</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics Metrics -->
+                <div class="analytics-metrics-grid">
+                    <div class="glass-card metric-card">
+                        <div class="metric-header">
+                            <h4>Total Trades</h4>
+                            <i class="fas fa-exchange-alt metric-icon"></i>
+                        </div>
+                        <div class="metric-value" id="analyticsTotalTrades">0</div>
+                        <div class="metric-breakdown">
+                            <span>Open: <strong id="analyticsOpenTrades">0</strong></span>
+                            <span>Closed: <strong id="analyticsClosedTrades">0</strong></span>
+                        </div>
+                    </div>
+
+                    <div class="glass-card metric-card">
+                        <div class="metric-header">
+                            <h4>Win Rate</h4>
+                            <i class="fas fa-trophy metric-icon"></i>
+                        </div>
+                        <div class="metric-value" id="analyticsWinRate">0%</div>
+                        <div class="metric-breakdown">
+                            <span>Wins: <strong id="analyticsWins">0</strong></span>
+                            <span>Losses: <strong id="analyticsLosses">0</strong></span>
+                        </div>
+                    </div>
+
+                    <div class="glass-card metric-card">
+                        <div class="metric-header">
+                            <h4>Total P&L</h4>
+                            <i class="fas fa-rupee-sign metric-icon"></i>
+                        </div>
+                        <div class="metric-value" id="analyticsTotalPL">₹0</div>
+                        <div class="metric-breakdown">
+                            <span>Avg P&L: <strong id="analyticsAvgPL">₹0</strong></span>
+                        </div>
+                    </div>
+
+                    <div class="glass-card metric-card">
+                        <div class="metric-header">
+                            <h4>Profit Factor</h4>
+                            <i class="fas fa-chart-line metric-icon"></i>
+                        </div>
+                        <div class="metric-value" id="analyticsProfitFactor">0.00</div>
+                        <div class="metric-breakdown">
+                            <span>Risk-Reward: <strong id="analyticsRiskReward">1:0</strong></span>
+                        </div>
+                    </div>
+
+                    <div class="glass-card metric-card">
+                        <div class="metric-header">
+                            <h4>Best Trade</h4>
+                            <i class="fas fa-star metric-icon"></i>
+                        </div>
+                        <div class="metric-value" id="analyticsBestTrade">₹0</div>
+                        <div class="metric-breakdown">
+                            <span>Worst: <strong id="analyticsWorstTrade">₹0</strong></span>
+                        </div>
+                    </div>
+
+                    <div class="glass-card metric-card">
+                        <div class="metric-header">
+                            <h4>Win Streak</h4>
+                            <i class="fas fa-fire metric-icon"></i>
+                        </div>
+                        <div class="metric-value" id="analyticsWinStreak">0</div>
+                        <div class="metric-breakdown">
+                            <span>Max: <strong id="analyticsMaxWinStreak">0</strong></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts -->
                 <div class="analytics-grid">
                     <div class="glass-card">
                         <div class="card-header">

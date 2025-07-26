@@ -1,327 +1,64 @@
-# Let me create the complete fixed Trading Journal Pro files with proper analytics filtering
+# First, let's examine the CSV data structure to understand what we're working with
+import pandas as pd
+import io
 
-# 1. Create the HTML file
-html_content = """<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trading Journal Pro - Analytics Fixed</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
-</head>
-<body>
-    <header class="header">
-        <div class="container">
-            <h1>Trading Journal Pro</h1>
-            <p class="subtitle">Professional NSE Trading Analytics Platform</p>
-        </div>
-    </header>
+# Read the CSV data from the attachment
+csv_data = '''Symbol,Entry Date,Exit Date,Entry Price,Exit Price,Quantity,Order Type,Strategy,Account,P&L,P&L %,Status
+INDIGO,2/24/2025,,"4,568.00",,1,Buy,Fusion Strategy,Paytm,,,
+CHOLAHLDNG,2/27/2025,06-06-2025,"1,634.45","1,926.00",2,Buy,Fusion Strategy,Paytm,,,
+NH,2/27/2025,07-02-2025,"1,488.00","1,995.80",2,Buy,IV Strategy,Paytm,,,
+SHAILY,03-04-2025,4/21/2025,"1,598.85","1,684.00",2,Buy,Fusion Strategy,Paytm,,,
+BLUESTARCO,03-04-2025,4/21/2025,"2,106.80","1,995.00",1,Buy,Fusion Strategy,Paytm,,,
+LUMAXIND,03-04-2025,4/30/2025,"2,392.00","2,362.85",1,Buy,Fusion Strategy,Paytm,,,
+WINDLAS,03-06-2025,07-09-2025,907.3,922.1,3,Buy,IV Strategy,Paytm,,,
+MANAPPURAM,1/21/2025,07-09-2025,194.2,263.35,10,Buy,30 SMA,Paytm,,,
+TECHM,3/28/2025,3/28/2025,"1,422.50","1,413.00",5,Sell,Kumbhakaran Strategy,Paytm,,,
+TECHM,3/28/2025,3/28/2025,"1,422.50","1,418.80",5,Sell,Kumbhakaran Strategy,Paytm,,,
+DEVYANI,04-02-2025,04-02-2025,149.2,150.77,90,Sell,Kumbhakaran Strategy,Paytm,,,
+BLUESTARCO,03-04-2025,4/30/2025,"2,106.80","1,702.70",1,Buy,Fusion Strategy,Paytm,,,
+SAREGAMA,4/21/2025,06-11-2025,556,547,6,Buy,Fusion Strategy,Paytm,,,
+OSWALAGRO,4/21/2025,4/28/2025,101.01,85,10,Buy,IV Strategy,Paytm,,,
+RELINFRA,4/21/2025,05-06-2025,272.4,236.7,3,Buy,Fusion Strategy,Paytm,,,
+PARAGMILK,5/15/2025,06-12-2025,214.66,214.66,8,Buy,Alpha 2.0,Paytm,,,
+LUMAXTECH,06-02-2025,07-02-2025 00:00,864.5,"1,118.10",5,Buy,IV Strategy,Zerodha,,,
+APLAPOLLO,06-04-2025,,"1,882.00",,3,Buy,ATH,Zerodha,,,
+BIKAJI,06-04-2025,,761,,8,Buy,Fusion Strategy,Zerodha,,,
+CCL,06-04-2025,6/18/202,904.5,791.3,6,Buy,ATH,Zerodha,,,
+DEEPAKFERT,06-04-2025,,"1,560.00",,4,Buy,ATH,Zerodha,,,
+GARUDA,06-05-2025,06-06-2025,123.3,127.6,28,Buy,RE Strategy (BTST),Zerodha,,,
+GARUDA,06-05-2025,06-10-2025,123.3,119.53,12,Buy,RE Strategy (BTST),Zerodha,,,
+GODREJIND,06-06-2025,07-02-2025,"1,361.00","1,169.00",4,Buy,IV Strategy,Zerodha,,,
+LICI,06-04-2025,,954.4,,6,Buy,IV Strategy,Zerodha,,,
+MARINE,06-06-2025,07-02-2025,238.8,205.35,18,Buy,IV Strategy,Zerodha,,,
+STYRENIX,06-04-2025,,"3,240.00",,2,Buy,ATH,Zerodha,,,
+ASIANPAINT,06-05-2025,06-05-2025,"2,251.60","2,246.00",5,Sell,Kumbhakaran Strategy,Zerodha,,,
+SUNPHARMA,06-09-2025,06-09-2025,"1,677.50","1,686.00",10,Sell,Kumbhakaran Strategy,Zerodha,,,
+NAVA,06-12-2025,,561.5,,9,Buy,IV Strategy,Zerodha,,,
+BHARTIARTL,6/20/2025,,"1,929.00",,3,Buy,ATH,Zerodha,,,
+KRBL,07-03-2025,,391.8,,12,Buy,Rabbit System,Zerodha,,,
+GODREJCP,07-03-2025,07-03-2025,"1,174.30","1,179.60",25,Sell,Kumbhakaran Strategy,Zerodha,,,
+NLCIND,07-03-2025,07-03-2025,227,226.85,50,Sell,Kumbhakaran Strategy,Zerodha,,,
+TRIVENI,07-04-2025,07-04-2025,374.8,372.54,80,Sell,Kumbhakaran Strategy,Zerodha,,,
+XPROINDIA,07-07-2025,07-07-2025,"1,193.90","1,199.08",20,Sell,Mother Candle Shorting,Zerodha,,,
+RPGLIFE,07-07-2025,,"2,675.00",,2,Buy,Fusion Strategy,Zerodha,,,'''
 
-    <nav class="nav-tabs">
-        <div class="container">
-            <ul class="tabs">
-                <li class="tab active" data-tab="dashboard">📊 Dashboard</li>
-                <li class="tab" data-tab="settings">⚙️ Settings</li>
-                <li class="tab" data-tab="trades">📈 Add Trade</li>
-                <li class="tab" data-tab="openTrades">🔄 Open Trades</li>
-                <li class="tab" data-tab="allTrades">📋 All Trades</li>
-                <li class="tab" data-tab="analytics">📊 Analytics</li>
-                <li class="tab" data-tab="news">📰 News & AI</li>
-            </ul>
-        </div>
-    </nav>
+# Read and analyze the data
+df = pd.read_csv(io.StringIO(csv_data))
 
-    <main class="main-content">
-        <div class="container">
-            <!-- Dashboard Tab -->
-            <div id="dashboard" class="tab-content active">
-                <h2>Portfolio Dashboard</h2>
-                <div class="dashboard-grid">
-                    <div class="card">
-                        <h3>Total Portfolio Value</h3>
-                        <div class="metric-value" id="totalPortfolioValue">₹0</div>
-                    </div>
-                    <div class="card">
-                        <h3>Available Balance</h3>
-                        <div class="metric-value" id="availableBalance">₹0</div>
-                    </div>
-                    <div class="card">
-                        <h3>Total P&L</h3>
-                        <div class="metric-value" id="totalPnL">₹0</div>
-                    </div>
-                    <div class="card">
-                        <h3>Open Positions</h3>
-                        <div class="metric-value" id="openPositions">0</div>
-                    </div>
-                </div>
-            </div>
+print("CSV Data Structure Analysis:")
+print(f"Total trades: {len(df)}")
+print(f"Columns: {list(df.columns)}")
+print(f"\nUnique Strategies: {df['Strategy'].unique()}")
+print(f"Unique Accounts: {df['Account'].unique()}")
+print(f"Unique Order Types: {df['Order Type'].unique()}")
 
-            <!-- Settings Tab -->
-            <div id="settings" class="tab-content">
-                <h2>Account & Strategy Settings</h2>
-                <div class="settings-grid">
-                    <div class="card">
-                        <h3>Accounts</h3>
-                        <div class="form-group">
-                            <input type="text" id="newAccountName" placeholder="Account Name">
-                            <input type="number" id="newAccountBalance" placeholder="Initial Balance">
-                            <button onclick="app.addAccount()" class="btn btn-primary">Add Account</button>
-                        </div>
-                        <ul id="accountsList"></ul>
-                    </div>
-                    <div class="card">
-                        <h3>Strategies</h3>
-                        <div class="form-group">
-                            <input type="text" id="newStrategyName" placeholder="Strategy Name">
-                            <button onclick="app.addStrategy()" class="btn btn-primary">Add Strategy</button>
-                        </div>
-                        <ul id="strategiesList"></ul>
-                    </div>
-                </div>
-            </div>
+# Check for open vs closed trades
+open_trades = df[df['Exit Date'].isna() | (df['Exit Date'] == '')]
+closed_trades = df[df['Exit Date'].notna() & (df['Exit Date'] != '')]
 
-            <!-- Add Trade Tab -->
-            <div id="trades" class="tab-content">
-                <h2>Add New Trade</h2>
-                <div class="card">
-                    <form id="tradeForm" class="trade-form">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Symbol</label>
-                                <input type="text" id="symbol" placeholder="e.g. RELIANCE" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Strategy</label>
-                                <select id="strategy" required></select>
-                            </div>
-                            <div class="form-group">
-                                <label>Account</label>
-                                <select id="account" required></select>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Entry Date</label>
-                                <input type="date" id="entryDate" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Buy Price (₹)</label>
-                                <input type="number" id="buyPrice" step="0.01" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Quantity</label>
-                                <input type="number" id="quantity" required>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Stop Loss (₹)</label>
-                                <input type="number" id="stopLoss" step="0.01">
-                            </div>
-                            <div class="form-group">
-                                <label>Target (₹)</label>
-                                <input type="number" id="target" step="0.01">
-                            </div>
-                            <div class="form-group">
-                                <label>Order Type</label>
-                                <select id="orderType">
-                                    <option value="Long">Long</option>
-                                    <option value="Short">Short</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Exit Date (Optional)</label>
-                                <input type="date" id="exitDate">
-                            </div>
-                            <div class="form-group">
-                                <label>Exit Price (₹) (Optional)</label>
-                                <input type="number" id="exitPrice" step="0.01">
-                            </div>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Add Trade</button>
-                    </form>
-                </div>
-            </div>
+print(f"\nOpen Trades: {len(open_trades)}")
+print(f"Closed Trades: {len(closed_trades)}")
 
-            <!-- Open Trades Tab -->
-            <div id="openTrades" class="tab-content">
-                <h2>Open Trades</h2>
-                <div class="card">
-                    <div class="table-container">
-                        <table id="openTradesTable">
-                            <thead>
-                                <tr>
-                                    <th>Symbol</th>
-                                    <th>Strategy</th>
-                                    <th>Account</th>
-                                    <th>Entry Date</th>
-                                    <th>Entry Price</th>
-                                    <th>Quantity</th>
-                                    <th>Current P&L</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- All Trades Tab -->
-            <div id="allTrades" class="tab-content">
-                <h2>All Trades</h2>
-                <div class="trade-controls">
-                    <div class="filters">
-                        <select id="accountFilter">
-                            <option value="">All Accounts</option>
-                        </select>
-                        <select id="strategyFilter">
-                            <option value="">All Strategies</option>
-                        </select>
-                        <select id="statusFilter">
-                            <option value="">All Status</option>
-                            <option value="Win">Wins</option>
-                            <option value="Loss">Losses</option>
-                            <option value="Open">Open</option>
-                        </select>
-                    </div>
-                    <div class="actions">
-                        <input type="file" id="csvFileInput" accept=".csv" style="display: none;">
-                        <button onclick="document.getElementById('csvFileInput').click()" class="btn btn-secondary">Import CSV</button>
-                        <button onclick="app.exportTradesToCSV()" class="btn btn-secondary">Export CSV</button>
-                        <button onclick="app.deleteSelectedTrades()" class="btn btn-danger">Delete Selected</button>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="table-container">
-                        <table id="allTradesTable">
-                            <thead>
-                                <tr>
-                                    <th><input type="checkbox" id="selectAll"></th>
-                                    <th>Symbol</th>
-                                    <th>Strategy</th>
-                                    <th>Account</th>
-                                    <th>Entry Date</th>
-                                    <th>Entry Price</th>
-                                    <th>Exit Date</th>
-                                    <th>Exit Price</th>
-                                    <th>Quantity</th>
-                                    <th>P&L</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Analytics Tab -->
-            <div id="analytics" class="tab-content">
-                <h2>Performance Analytics</h2>
-                
-                <!-- Analytics Filters -->
-                <div class="analytics-filters">
-                    <select id="analyticsAccountFilter">
-                        <option value="">All Accounts</option>
-                    </select>
-                    <select id="analyticsStrategyFilter">
-                        <option value="">All Strategies</option>
-                    </select>
-                    <select id="analyticsStatusFilter">
-                        <option value="">All Trades</option>
-                        <option value="Win">Wins Only</option>
-                        <option value="Loss">Losses Only</option>
-                        <option value="Closed">Closed Trades Only</option>
-                    </select>
-                    <input type="date" id="analyticsDateFrom" placeholder="From Date">
-                    <input type="date" id="analyticsDateTo" placeholder="To Date">
-                </div>
-
-                <!-- Metrics Grid -->
-                <div class="metrics-grid">
-                    <div class="metric-card">
-                        <h3>Total Trades</h3>
-                        <div class="metric-value" id="metricTotalTrades">0</div>
-                    </div>
-                    <div class="metric-card">
-                        <h3>Win Rate</h3>
-                        <div class="metric-value" id="metricWinRate">0%</div>
-                    </div>
-                    <div class="metric-card">
-                        <h3>Total P&L</h3>
-                        <div class="metric-value" id="metricTotalPnL">₹0</div>
-                    </div>
-                    <div class="metric-card">
-                        <h3>Profit Factor</h3>
-                        <div class="metric-value" id="metricProfitFactor">0</div>
-                    </div>
-                    <div class="metric-card">
-                        <h3>Best Trade</h3>
-                        <div class="metric-value" id="metricBestTrade">₹0</div>
-                    </div>
-                    <div class="metric-card">
-                        <h3>Worst Trade</h3>
-                        <div class="metric-value" id="metricWorstTrade">₹0</div>
-                    </div>
-                    <div class="metric-card">
-                        <h3>Avg Win</h3>
-                        <div class="metric-value" id="metricAvgWin">₹0</div>
-                    </div>
-                    <div class="metric-card">
-                        <h3>Avg Loss</h3>
-                        <div class="metric-value" id="metricAvgLoss">₹0</div>
-                    </div>
-                </div>
-
-                <!-- Charts Grid -->
-                <div class="charts-grid">
-                    <div class="chart-card">
-                        <h3>Equity Curve</h3>
-                        <canvas id="equityCurveChart"></canvas>
-                    </div>
-                    <div class="chart-card">
-                        <h3>Win/Loss Distribution</h3>
-                        <canvas id="winLossChart"></canvas>
-                    </div>
-                    <div class="chart-card">
-                        <h3>P&L by Strategy</h3>
-                        <canvas id="strategyChart"></canvas>
-                    </div>
-                    <div class="chart-card">
-                        <h3>Monthly Performance</h3>
-                        <canvas id="monthlyChart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <!-- News & AI Tab -->
-            <div id="news" class="tab-content">
-                <h2>Market News & AI Insights</h2>
-                <div class="card">
-                    <h3>Latest Market News</h3>
-                    <div id="newsContainer">
-                        <p>Loading market news...</p>
-                    </div>
-                </div>
-                <div class="card">
-                    <h3>AI Trading Insights</h3>
-                    <div id="aiInsights">
-                        <p>Analyzing your trading patterns...</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <script src="app.js"></script>
-</body>
-</html>"""
-
-# Save HTML file
-with open("index.html", "w", encoding="utf-8") as f:
-    f.write(html_content)
-
-print("✅ index.html created successfully")
+# Sample rows
+print(f"\nFirst 5 rows:")
+print(df.head())
