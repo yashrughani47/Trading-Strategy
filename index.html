@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trading Journal Pro - Advanced Analytics Platform</title>
+    <title>Trading Journal Pro - Enhanced Analytics & AI Platform</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -157,6 +157,26 @@
                         </div>
                         <div class="strategies-list" id="strategiesList"></div>
                     </div>
+
+                    <div class="glass-card" style="grid-column: 1 / -1;">
+                        <div class="card-header">
+                            <h3>Data Management</h3>
+                        </div>
+                        <div class="data-management-controls">
+                            <button class="btn-primary" id="exportDataBtn">
+                                <i class="fas fa-download"></i>
+                                Export All Data
+                            </button>
+                            <button class="btn-secondary" id="importDataBtn">
+                                <i class="fas fa-upload"></i>
+                                Import Data
+                            </button>
+                            <button class="btn-danger" id="resetDataBtn">
+                                <i class="fas fa-trash-restore"></i>
+                                Reset All Data
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -303,11 +323,11 @@
                 </div>
             </div>
 
-            <!-- Analytics Tab -->
+            <!-- Enhanced Analytics Tab -->
             <div class="tab-content" id="analytics">
                 <div class="tab-header">
-                    <h1 class="tab-title">Analytics</h1>
-                    <div class="tab-subtitle">Performance insights and metrics</div>
+                    <h1 class="tab-title">Enhanced Analytics</h1>
+                    <div class="tab-subtitle">Professional performance insights and metrics</div>
                 </div>
                 
                 <!-- Analytics Filters -->
@@ -344,17 +364,16 @@
                     </div>
                 </div>
 
-                <!-- Analytics Metrics -->
+                <!-- Enhanced Professional Trading Metrics -->
                 <div class="analytics-metrics-grid">
                     <div class="glass-card metric-card">
                         <div class="metric-header">
-                            <h4>Total Trades</h4>
-                            <i class="fas fa-exchange-alt metric-icon"></i>
+                            <h4>Total Return</h4>
+                            <i class="fas fa-percentage metric-icon"></i>
                         </div>
-                        <div class="metric-value" id="analyticsTotalTrades">0</div>
+                        <div class="metric-value" id="analyticsTotalReturn">0%</div>
                         <div class="metric-breakdown">
-                            <span>Open: <strong id="analyticsOpenTrades">0</strong></span>
-                            <span>Closed: <strong id="analyticsClosedTrades">0</strong></span>
+                            <span>ROI: <strong id="analyticsROI">0%</strong></span>
                         </div>
                     </div>
 
@@ -372,50 +391,122 @@
 
                     <div class="glass-card metric-card">
                         <div class="metric-header">
-                            <h4>Total P&L</h4>
-                            <i class="fas fa-rupee-sign metric-icon"></i>
-                        </div>
-                        <div class="metric-value" id="analyticsTotalPL">₹0</div>
-                        <div class="metric-breakdown">
-                            <span>Avg P&L: <strong id="analyticsAvgPL">₹0</strong></span>
-                        </div>
-                    </div>
-
-                    <div class="glass-card metric-card">
-                        <div class="metric-header">
                             <h4>Profit Factor</h4>
                             <i class="fas fa-chart-line metric-icon"></i>
                         </div>
                         <div class="metric-value" id="analyticsProfitFactor">0.00</div>
                         <div class="metric-breakdown">
-                            <span>Risk-Reward: <strong id="analyticsRiskReward">1:0</strong></span>
+                            <span>Gross Profit/Loss: <strong id="analyticsGrossPL">1.00</strong></span>
                         </div>
                     </div>
 
                     <div class="glass-card metric-card">
                         <div class="metric-header">
-                            <h4>Best Trade</h4>
-                            <i class="fas fa-star metric-icon"></i>
+                            <h4>Sharpe Ratio</h4>
+                            <i class="fas fa-balance-scale metric-icon"></i>
                         </div>
-                        <div class="metric-value" id="analyticsBestTrade">₹0</div>
+                        <div class="metric-value" id="analyticsSharpeRatio">0.00</div>
                         <div class="metric-breakdown">
-                            <span>Worst: <strong id="analyticsWorstTrade">₹0</strong></span>
+                            <span>Risk-Adj Return: <strong id="analyticsRiskAdjReturn">0%</strong></span>
                         </div>
                     </div>
 
                     <div class="glass-card metric-card">
                         <div class="metric-header">
-                            <h4>Win Streak</h4>
-                            <i class="fas fa-fire metric-icon"></i>
+                            <h4>Max Drawdown</h4>
+                            <i class="fas fa-arrow-down metric-icon"></i>
                         </div>
-                        <div class="metric-value" id="analyticsWinStreak">0</div>
+                        <div class="metric-value" id="analyticsMaxDrawdown">0%</div>
                         <div class="metric-breakdown">
-                            <span>Max: <strong id="analyticsMaxWinStreak">0</strong></span>
+                            <span>Peak-to-Trough: <strong id="analyticsPeakTrough">₹0</strong></span>
+                        </div>
+                    </div>
+
+                    <div class="glass-card metric-card">
+                        <div class="metric-header">
+                            <h4>Avg Win/Loss</h4>
+                            <i class="fas fa-coins metric-icon"></i>
+                        </div>
+                        <div class="metric-value" id="analyticsAvgWinLoss">0:0</div>
+                        <div class="metric-breakdown">
+                            <span>Avg Win: <strong id="analyticsAvgWin">₹0</strong></span>
+                            <span>Avg Loss: <strong id="analyticsAvgLoss">₹0</strong></span>
+                        </div>
+                    </div>
+
+                    <div class="glass-card metric-card">
+                        <div class="metric-header">
+                            <h4>Avg Hold Time</h4>
+                            <i class="fas fa-clock metric-icon"></i>
+                        </div>
+                        <div class="metric-value" id="analyticsAvgHoldTime">0 days</div>
+                        <div class="metric-breakdown">
+                            <span>Median: <strong id="analyticsMedianHoldTime">0 days</strong></span>
+                        </div>
+                    </div>
+
+                    <div class="glass-card metric-card">
+                        <div class="metric-header">
+                            <h4>Total P&L</h4>
+                            <i class="fas fa-rupee-sign metric-icon"></i>
+                        </div>
+                        <div class="metric-value" id="analyticsTotalPL">₹0</div>
+                        <div class="metric-breakdown">
+                            <span>Open P&L: <strong id="analyticsOpenPL">₹0</strong></span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Charts -->
+                <!-- Strategy Performance with Detailed Numbers -->
+                <div class="glass-card strategy-performance-card">
+                    <div class="card-header">
+                        <h3>Strategy Performance Breakdown</h3>
+                        <div class="performance-toggle">
+                            <button class="btn-secondary" id="strategyViewToggle">Table View</button>
+                        </div>
+                    </div>
+                    <div id="strategyPerformanceTable" class="strategy-performance-table"></div>
+                    <div class="chart-container" id="strategyPerformanceChart" style="position: relative; height: 300px; display: none;">
+                        <canvas id="strategyChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Risk Analysis -->
+                <div class="glass-card risk-analysis-card">
+                    <div class="card-header">
+                        <h3>Risk Analysis & Recommendations</h3>
+                        <div class="risk-level" id="riskLevelIndicator">
+                            <span class="risk-dot"></span>
+                            <span class="risk-text">Moderate Risk</span>
+                        </div>
+                    </div>
+                    <div class="risk-metrics-grid">
+                        <div class="risk-metric">
+                            <div class="risk-metric-label">Risk Score</div>
+                            <div class="risk-metric-value" id="riskScore">7.2/10</div>
+                        </div>
+                        <div class="risk-metric">
+                            <div class="risk-metric-label">Volatility</div>
+                            <div class="risk-metric-value" id="volatilityScore">12.5%</div>
+                        </div>
+                        <div class="risk-metric">
+                            <div class="risk-metric-label">Consistency</div>
+                            <div class="risk-metric-value" id="consistencyScore">85%</div>
+                        </div>
+                    </div>
+                    <div class="risk-recommendations" id="riskRecommendations">
+                        <div class="recommendation-item">
+                            <i class="fas fa-lightbulb"></i>
+                            <span>Consider reducing position size on high-volatility trades</span>
+                        </div>
+                        <div class="recommendation-item">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>Your stop-loss usage is excellent - maintain this discipline</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Grid -->
                 <div class="analytics-grid">
                     <div class="glass-card">
                         <div class="card-header">
@@ -446,97 +537,268 @@
 
                     <div class="glass-card">
                         <div class="card-header">
-                            <h3>Strategy Performance</h3>
+                            <h3>Drawdown Analysis</h3>
                         </div>
                         <div class="chart-container" style="position: relative; height: 300px;">
-                            <canvas id="strategyChart"></canvas>
+                            <canvas id="drawdownChart"></canvas>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- News & AI Tab -->
+            <!-- Enhanced News & AI Tab -->
             <div class="tab-content" id="news">
                 <div class="tab-header">
                     <h1 class="tab-title">News & AI Insights</h1>
-                    <div class="tab-subtitle">Market news and sentiment analysis</div>
+                    <div class="tab-subtitle">Real-time market data and AI-powered trading insights</div>
                 </div>
                 
-                <div class="news-grid">
-                    <div class="glass-card ai-summary">
+                <!-- Real-time Market Data -->
+                <div class="market-data-grid">
+                    <div class="glass-card market-index">
+                        <div class="index-header">
+                            <h4>NIFTY 50</h4>
+                            <div class="index-sentiment positive">
+                                <i class="fas fa-arrow-up"></i>
+                            </div>
+                        </div>
+                        <div class="index-value" id="nifty50Value">24,596.15</div>
+                        <div class="index-change positive" id="nifty50Change">+21.95 (0.09%)</div>
+                    </div>
+
+                    <div class="glass-card market-index">
+                        <div class="index-header">
+                            <h4>BSE SENSEX</h4>
+                            <div class="index-sentiment negative">
+                                <i class="fas fa-arrow-down"></i>
+                            </div>
+                        </div>
+                        <div class="index-value" id="sensexValue">80,400.73</div>
+                        <div class="index-change negative" id="sensexChange">-143.27 (-0.18%)</div>
+                    </div>
+
+                    <div class="glass-card market-index">
+                        <div class="index-header">
+                            <h4>BANK NIFTY</h4>
+                            <div class="index-sentiment positive">
+                                <i class="fas fa-arrow-up"></i>
+                            </div>
+                        </div>
+                        <div class="index-value" id="bankNiftyValue">51,245.30</div>
+                        <div class="index-change positive" id="bankNiftyChange">+125.45 (0.25%)</div>
+                    </div>
+
+                    <div class="glass-card market-index">
+                        <div class="index-header">
+                            <h4>IT INDEX</h4>
+                            <div class="index-sentiment negative">
+                                <i class="fas fa-arrow-down"></i>
+                            </div>
+                        </div>
+                        <div class="index-value" id="itIndexValue">43,287.65</div>
+                        <div class="index-change negative" id="itIndexChange">-89.12 (-0.21%)</div>
+                    </div>
+                </div>
+
+                <!-- AI Insights and News Grid -->
+                <div class="news-ai-grid">
+                    <!-- AI Trading Insights -->
+                    <div class="glass-card ai-insights-card">
                         <div class="card-header">
-                            <h3>AI Market Summary</h3>
+                            <h3>AI Trading Insights</h3>
                             <div class="ai-status">
                                 <div class="status-dot active"></div>
                                 <span>Live Analysis</span>
                             </div>
                         </div>
-                        <div class="ai-content">
-                            <div class="sentiment-indicator positive">
-                                <i class="fas fa-arrow-up"></i>
-                                <span>Market Sentiment: Positive</span>
+                        <div class="ai-insights-content">
+                            <div class="insight-section">
+                                <h4>Trading Pattern Analysis</h4>
+                                <div class="confidence-score">
+                                    <span>Confidence: </span>
+                                    <div class="confidence-bar">
+                                        <div class="confidence-fill" style="width: 87%"></div>
+                                    </div>
+                                    <span>87%</span>
+                                </div>
+                                <p id="patternAnalysis">Your strategy performance shows strong momentum trading patterns with 73% accuracy in trend following trades.</p>
                             </div>
-                            <p>Current market conditions show strong bullish momentum across major indices. Tech sector leading gains with increased institutional buying.</p>
+                            
+                            <div class="insight-section">
+                                <h4>Risk Profile Assessment</h4>
+                                <div class="risk-gauge">
+                                    <div class="gauge-container">
+                                        <div class="gauge-fill moderate"></div>
+                                        <span class="gauge-label">Moderate</span>
+                                    </div>
+                                </div>
+                                <p id="riskAssessment">Your current risk profile is well-balanced. Consider increasing position sizes on high-conviction trades.</p>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="glass-card news-list">
+                    <!-- Top 5 Curated News -->
+                    <div class="glass-card news-section">
                         <div class="card-header">
-                            <h3>Latest Market News</h3>
-                            <button class="btn-icon" id="refreshNews">
-                                <i class="fas fa-refresh"></i>
-                            </button>
+                            <h3>Top 5 Market News</h3>
+                            <div class="news-timestamp">
+                                <i class="fas fa-clock"></i>
+                                <span id="newsTimestamp">Updated: Aug 07, 2025 8:00 PM IST</span>
+                            </div>
                         </div>
-                        <div class="news-items" id="newsItems"></div>
+                        <div class="news-items" id="curatedNewsItems">
+                            <!-- News items will be populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance Improvement Recommendations -->
+                <div class="glass-card recommendations-card">
+                    <div class="card-header">
+                        <h3>Personalized Performance Improvement Recommendations</h3>
+                        <div class="recommendation-score">
+                            <span>Impact Score: </span>
+                            <strong>High Priority</strong>
+                        </div>
+                    </div>
+                    <div class="recommendations-grid" id="performanceRecommendations">
+                        <!-- Recommendations will be populated by JavaScript -->
+                    </div>
+                </div>
+
+                <!-- Market Sentiment Analysis -->
+                <div class="glass-card sentiment-analysis-card">
+                    <div class="card-header">
+                        <h3>Market Sentiment Analysis</h3>
+                        <div class="overall-sentiment positive">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Bullish Momentum</span>
+                        </div>
+                    </div>
+                    <div class="sentiment-metrics">
+                        <div class="sentiment-metric">
+                            <div class="sentiment-label">Market Sentiment</div>
+                            <div class="sentiment-bar">
+                                <div class="sentiment-fill positive" style="width: 72%"></div>
+                            </div>
+                            <div class="sentiment-value">72% Bullish</div>
+                        </div>
+                        <div class="sentiment-metric">
+                            <div class="sentiment-label">News Impact</div>
+                            <div class="sentiment-bar">
+                                <div class="sentiment-fill moderate" style="width: 58%"></div>
+                            </div>
+                            <div class="sentiment-value">58% Positive</div>
+                        </div>
+                        <div class="sentiment-metric">
+                            <div class="sentiment-label">Technical Indicators</div>
+                            <div class="sentiment-bar">
+                                <div class="sentiment-fill positive" style="width: 81%"></div>
+                            </div>
+                            <div class="sentiment-value">81% Buy Signal</div>
+                        </div>
                     </div>
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- Modals -->
+    <!-- Enhanced Close Trade Modal -->
+    <div class="modal hidden" id="closeTradeModal">
+        <div class="modal-overlay" id="closeTradeModalOverlay"></div>
+        <div class="modal-content glass-card">
+            <div class="modal-header">
+                <h3 id="closeTradeTitle">Close Position: SYMBOL</h3>
+                <button class="modal-close" id="closeTradeModalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="closeTradeForm">
+                <div class="form-group">
+                    <label class="form-label">Exit Date</label>
+                    <input type="date" class="form-control" id="exitDate" required>
+                    <div class="validation-message" id="exitDateError"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Exit Price</label>
+                    <input type="number" class="form-control" id="exitPrice" step="0.01" min="0.01" required>
+                    <div class="validation-message" id="exitPriceError"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Quantity to Close</label>
+                    <input type="number" class="form-control" id="quantityToClose" min="1" required>
+                    <div class="help-text" id="availableQuantityText">Available: 0 shares</div>
+                    <div class="validation-message" id="quantityError"></div>
+                </div>
+
+                <div class="pl-preview" id="plPreview">
+                    <div class="pl-preview-header">Expected P&L</div>
+                    <div class="pl-preview-value" id="expectedPL">₹0.00</div>
+                    <div class="pl-preview-percent" id="expectedPLPercent">(0.00%)</div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary" id="closePositionBtn">
+                        <i class="fas fa-check"></i>
+                        Close Position
+                    </button>
+                    <button type="button" class="btn-secondary" id="cancelCloseBtn">
+                        <i class="fas fa-times"></i>
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Enhanced Account Modal -->
     <div class="modal hidden" id="accountModal">
         <div class="modal-overlay" id="accountModalOverlay"></div>
         <div class="modal-content glass-card">
             <div class="modal-header">
-                <h3>Add Account</h3>
+                <h3 id="accountModalTitle">Add Account</h3>
                 <button class="modal-close" id="closeAccountModal">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <form id="accountForm">
+                <input type="hidden" id="accountId" value="">
                 <div class="form-group">
                     <label class="form-label">Account Name</label>
                     <input type="text" class="form-control" id="accountName" required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">Initial Balance</label>
+                    <label class="form-label">Balance</label>
                     <input type="number" class="form-control" id="accountBalance" step="0.01" required>
                 </div>
                 <div class="form-actions">
-                    <button type="submit" class="btn-primary">Add Account</button>
+                    <button type="submit" class="btn-primary" id="saveAccountBtn">Save Account</button>
                     <button type="button" class="btn-secondary" id="cancelAccount">Cancel</button>
                 </div>
             </form>
         </div>
     </div>
 
+    <!-- Enhanced Strategy Modal -->
     <div class="modal hidden" id="strategyModal">
         <div class="modal-overlay" id="strategyModalOverlay"></div>
         <div class="modal-content glass-card">
             <div class="modal-header">
-                <h3>Add Strategy</h3>
+                <h3 id="strategyModalTitle">Add Strategy</h3>
                 <button class="modal-close" id="closeStrategyModal">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <form id="strategyForm">
+                <input type="hidden" id="strategyId" value="">
                 <div class="form-group">
                     <label class="form-label">Strategy Name</label>
                     <input type="text" class="form-control" id="strategyName" required>
                 </div>
                 <div class="form-actions">
-                    <button type="submit" class="btn-primary">Add Strategy</button>
+                    <button type="submit" class="btn-primary" id="saveStrategyBtn">Save Strategy</button>
                     <button type="button" class="btn-secondary" id="cancelStrategy">Cancel</button>
                 </div>
             </form>
@@ -544,6 +806,10 @@
     </div>
 
     <input type="file" id="csvFileInput" accept=".csv" style="display: none;">
+    <input type="file" id="jsonFileInput" accept=".json" style="display: none;">
+    
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="toast-container"></div>
     
     <!-- Font Awesome for Icons -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
