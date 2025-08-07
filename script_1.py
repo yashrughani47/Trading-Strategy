@@ -1,566 +1,360 @@
-# Create the CSS file with blue and white professional theme
-css_content = """/* Trading Journal Pro - Blue & White Professional Theme */
+# Create an enhanced CSV parsing solution that handles the specific issues
 
-:root {
-    /* Color Variables */
-    --primary-blue: #1E40AF;
-    --light-blue: #3B82F6;
-    --accent-blue: #60A5FA;
-    --dark-blue: #1E3A8A;
-    --white: #FFFFFF;
-    --light-gray: #F8FAFC;
-    --medium-gray: #E2E8F0;
-    --dark-gray: #64748B;
-    --text-dark: #1E293B;
-    --success-green: #059669;
-    --danger-red: #DC2626;
-    --warning-orange: #D97706;
+enhanced_csv_parser = '''
+// ENHANCED CSV PARSER - Bulletproof CSV Import with Proper Column Mapping
+
+parseCSV(csv) {
+    console.log('🔍 Starting enhanced CSV parsing...');
     
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, var(--primary-blue) 0%, var(--light-blue) 100%);
-    --gradient-light: linear-gradient(135deg, var(--white) 0%, var(--light-gray) 100%);
-    --gradient-accent: linear-gradient(135deg, var(--accent-blue) 0%, var(--light-blue) 100%);
-    
-    /* Shadows */
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-}
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: var(--light-gray);
-    color: var(--text-dark);
-    line-height: 1.6;
-    overflow-x: hidden;
-}
-
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 1rem;
-}
-
-/* Header */
-.header {
-    background: var(--gradient-primary);
-    color: white;
-    padding: 2rem 0;
-    box-shadow: var(--shadow-lg);
-}
-
-.header h1 {
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-}
-
-.subtitle {
-    font-size: 1.1rem;
-    opacity: 0.9;
-}
-
-/* Navigation Tabs */
-.nav-tabs {
-    background: white;
-    border-bottom: 1px solid var(--medium-gray);
-    box-shadow: var(--shadow-sm);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-}
-
-.tabs {
-    display: flex;
-    list-style: none;
-    overflow-x: auto;
-    padding: 0;
-}
-
-.tab {
-    padding: 1rem 1.5rem;
-    cursor: pointer;
-    border-bottom: 3px solid transparent;
-    transition: all 0.3s ease;
-    white-space: nowrap;
-    font-weight: 500;
-    color: var(--dark-gray);
-}
-
-.tab:hover {
-    background: var(--light-gray);
-    color: var(--primary-blue);
-}
-
-.tab.active {
-    background: var(--light-gray);
-    border-bottom-color: var(--primary-blue);
-    color: var(--primary-blue);
-}
-
-/* Main Content */
-.main-content {
-    padding: 2rem 0;
-    min-height: calc(100vh - 200px);
-}
-
-.tab-content {
-    display: none;
-}
-
-.tab-content.active {
-    display: block;
-    animation: fadeIn 0.3s ease-in;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* Cards */
-.card {
-    background: white;
-    border-radius: 12px;
-    padding: 1.5rem;
-    box-shadow: var(--shadow-md);
-    margin-bottom: 1.5rem;
-    border: 1px solid var(--medium-gray);
-    transition: all 0.3s ease;
-}
-
-.card:hover {
-    box-shadow: var(--shadow-lg);
-    transform: translateY(-2px);
-}
-
-.card h3 {
-    color: var(--primary-blue);
-    margin-bottom: 1rem;
-    font-size: 1.25rem;
-    font-weight: 600;
-}
-
-/* Dashboard Grid */
-.dashboard-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.5rem;
-    margin-top: 1rem;
-}
-
-.metric-value {
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--primary-blue);
-    margin-top: 0.5rem;
-}
-
-/* Settings Grid */
-.settings-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
-    margin-top: 1rem;
-}
-
-/* Forms */
-.form-group {
-    margin-bottom: 1rem;
-}
-
-.form-row {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-    margin-bottom: 1rem;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 500;
-    color: var(--text-dark);
-}
-
-.form-group input,
-.form-group select {
-    width: 100%;
-    padding: 0.75rem;
-    border: 1px solid var(--medium-gray);
-    border-radius: 6px;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    background: white;
-}
-
-.form-group input:focus,
-.form-group select:focus {
-    outline: none;
-    border-color: var(--primary-blue);
-    box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
-}
-
-/* Buttons */
-.btn {
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: 6px;
-    font-size: 1rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: inline-block;
-    text-decoration: none;
-    text-align: center;
-}
-
-.btn-primary {
-    background: var(--gradient-primary);
-    color: white;
-}
-
-.btn-primary:hover {
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-lg);
-    filter: brightness(1.05);
-}
-
-.btn-secondary {
-    background: var(--medium-gray);
-    color: var(--text-dark);
-}
-
-.btn-secondary:hover {
-    background: var(--dark-gray);
-    color: white;
-}
-
-.btn-danger {
-    background: var(--danger-red);
-    color: white;
-}
-
-.btn-danger:hover {
-    background: #B91C1C;
-    transform: translateY(-1px);
-}
-
-/* Trade Controls */
-.trade-controls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-    padding: 1rem;
-    background: white;
-    border-radius: 8px;
-    box-shadow: var(--shadow-sm);
-}
-
-.filters {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-}
-
-.filters select {
-    padding: 0.5rem;
-    border: 1px solid var(--medium-gray);
-    border-radius: 4px;
-    background: white;
-}
-
-.actions {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-}
-
-/* Analytics Filters */
-.analytics-filters {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-    margin-bottom: 2rem;
-    padding: 1rem;
-    background: white;
-    border-radius: 8px;
-    box-shadow: var(--shadow-sm);
-}
-
-.analytics-filters select,
-.analytics-filters input {
-    padding: 0.5rem;
-    border: 1px solid var(--medium-gray);
-    border-radius: 4px;
-    background: white;
-}
-
-/* Metrics Grid */
-.metrics-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-    margin-bottom: 2rem;
-}
-
-.metric-card {
-    background: white;
-    padding: 1.5rem;
-    border-radius: 8px;
-    box-shadow: var(--shadow-md);
-    text-align: center;
-    border: 1px solid var(--medium-gray);
-    transition: all 0.3s ease;
-}
-
-.metric-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
-}
-
-.metric-card h3 {
-    font-size: 0.9rem;
-    color: var(--dark-gray);
-    margin-bottom: 0.5rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.metric-card .metric-value {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--primary-blue);
-}
-
-/* Charts Grid */
-.charts-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-    gap: 1.5rem;
-}
-
-.chart-card {
-    background: white;
-    padding: 1.5rem;
-    border-radius: 8px;
-    box-shadow: var(--shadow-md);
-    border: 1px solid var(--medium-gray);
-}
-
-.chart-card h3 {
-    margin-bottom: 1rem;
-    color: var(--primary-blue);
-}
-
-.chart-card canvas {
-    max-height: 300px;
-}
-
-/* Tables */
-.table-container {
-    overflow-x: auto;
-    border-radius: 8px;
-    border: 1px solid var(--medium-gray);
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: white;
-}
-
-table th,
-table td {
-    padding: 0.75rem;
-    text-align: left;
-    border-bottom: 1px solid var(--medium-gray);
-}
-
-table th {
-    background: var(--light-gray);
-    font-weight: 600;
-    color: var(--text-dark);
-    position: sticky;
-    top: 0;
-    z-index: 10;
-}
-
-table tr:hover {
-    background: rgba(30, 64, 175, 0.05);
-}
-
-/* Status Colors */
-.status-win {
-    color: var(--success-green);
-    font-weight: 600;
-}
-
-.status-loss {
-    color: var(--danger-red);
-    font-weight: 600;
-}
-
-.status-open {
-    color: var(--warning-orange);
-    font-weight: 600;
-}
-
-/* PnL Colors */
-.pnl-positive {
-    color: var(--success-green);
-    font-weight: 600;
-}
-
-.pnl-negative {
-    color: var(--danger-red);
-    font-weight: 600;
-}
-
-.pnl-neutral {
-    color: var(--dark-gray);
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .header h1 {
-        font-size: 2rem;
+    const lines = csv.trim().split('\\n');
+    if (lines.length < 2) {
+        throw new Error('CSV file must contain at least a header row and one data row');
     }
     
-    .tabs {
-        padding: 0 1rem;
+    // Parse headers with enhanced cleaning
+    const headers = this.parseCSVLine(lines[0]).map(h => 
+        h.trim()
+            .replace(/[\\r\\n"]/g, '')
+            .replace(/&amp;/g, '&')
+            .toLowerCase()
+    );
+    
+    console.log('📋 Parsed headers:', headers);
+    
+    // Create header mapping for flexible column matching
+    const headerMap = this.createHeaderMapping(headers);
+    console.log('🗺️ Header mapping:', headerMap);
+    
+    const trades = [];
+    let successCount = 0;
+    let errorCount = 0;
+    
+    for (let i = 1; i < lines.length; i++) {
+        try {
+            const line = lines[i].trim();
+            if (!line) continue; // Skip empty lines
+            
+            const values = this.parseCSVLine(line);
+            if (values.length < headers.length - 2) {
+                console.warn(`⚠️ Row ${i}: Insufficient columns (${values.length}/${headers.length})`);
+                continue;
+            }
+            
+            // Create row object with proper mapping
+            const rowData = {};
+            headers.forEach((header, index) => {
+                rowData[header] = values[index] || '';
+            });
+            
+            console.log(`📊 Row ${i} data:`, rowData);
+            
+            // Extract and validate trade data with fallback logic
+            const trade = this.extractTradeFromRow(rowData, headerMap, i);
+            
+            if (this.validateTradeData(trade)) {
+                // Auto-add new strategies and accounts
+                this.ensureStrategyExists(trade.strategy);
+                this.ensureAccountExists(trade.account);
+                
+                trades.push(trade);
+                successCount++;
+                console.log(`✅ Row ${i}: Successfully parsed ${trade.symbol}`);
+            } else {
+                console.warn(`⚠️ Row ${i}: Failed validation for ${trade.symbol || 'Unknown'}`);
+                errorCount++;
+            }
+            
+        } catch (error) {
+            console.error(`❌ Error parsing row ${i}:`, error);
+            errorCount++;
+        }
     }
     
-    .tab {
-        padding: 0.75rem 1rem;
-        font-size: 0.9rem;
+    console.log(`📈 CSV Import Results: ${successCount} success, ${errorCount} errors`);
+    
+    if (trades.length === 0) {
+        throw new Error('No valid trades found in CSV file');
     }
     
-    .dashboard-grid,
-    .settings-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .form-row {
-        grid-template-columns: 1fr;
-    }
-    
-    .trade-controls {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    
-    .filters,
-    .actions {
-        justify-content: center;
-    }
-    
-    .analytics-filters {
-        flex-direction: column;
-    }
-    
-    .metrics-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    
-    .charts-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .metric-value {
-        font-size: 1.5rem;
-    }
+    return trades;
 }
 
-/* Loading States */
-.loading {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 200px;
-    color: var(--dark-gray);
+createHeaderMapping(headers) {
+    // Create flexible mapping for different header variations
+    const mapping = {};
+    
+    headers.forEach((header, index) => {
+        const cleanHeader = header.toLowerCase().trim();
+        
+        // Map various symbol column names
+        if (cleanHeader.includes('symbol') || cleanHeader.includes('stock') || cleanHeader.includes('scrip')) {
+            mapping.symbol = index;
+        }
+        // Map entry date variations
+        else if (cleanHeader.includes('entry') && cleanHeader.includes('date')) {
+            mapping.entryDate = index;
+        }
+        // Map exit date variations
+        else if (cleanHeader.includes('exit') && cleanHeader.includes('date')) {
+            mapping.exitDate = index;
+        }
+        // Map entry price variations
+        else if (cleanHeader.includes('entry') && cleanHeader.includes('price')) {
+            mapping.entryPrice = index;
+        }
+        // Map exit price variations
+        else if (cleanHeader.includes('exit') && cleanHeader.includes('price')) {
+            mapping.exitPrice = index;
+        }
+        // Map quantity variations
+        else if (cleanHeader.includes('quantity') || cleanHeader.includes('qty')) {
+            mapping.quantity = index;
+        }
+        // Map order type variations
+        else if (cleanHeader.includes('order') && cleanHeader.includes('type')) {
+            mapping.orderType = index;
+        }
+        // Map strategy variations
+        else if (cleanHeader.includes('strategy')) {
+            mapping.strategy = index;
+        }
+        // Map account variations
+        else if (cleanHeader.includes('account') || cleanHeader.includes('broker')) {
+            mapping.account = index;
+        }
+    });
+    
+    return mapping;
 }
 
-.loading::before {
-    content: "";
-    width: 20px;
-    height: 20px;
-    margin-right: 10px;
-    border: 2px solid var(--medium-gray);
-    border-top: 2px solid var(--primary-blue);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
+extractTradeFromRow(rowData, headerMap, rowIndex) {
+    const headers = Object.keys(rowData);
+    
+    // Use header mapping with fallbacks
+    const getFieldValue = (mappingKey, fallbackNames = []) => {
+        // Try mapped index first
+        if (headerMap[mappingKey] !== undefined) {
+            const value = headers[headerMap[mappingKey]];
+            if (value && rowData[value] !== undefined) {
+                return rowData[value];
+            }
+        }
+        
+        // Try fallback names
+        for (const fallback of fallbackNames) {
+            const found = headers.find(h => 
+                h.toLowerCase().includes(fallback.toLowerCase())
+            );
+            if (found && rowData[found]) {
+                return rowData[found];
+            }
+        }
+        
+        return '';
+    };
+    
+    const trade = {
+        symbol: getFieldValue('symbol', ['symbol', 'stock', 'scrip']),
+        entryDate: this.parseDate(getFieldValue('entryDate', ['entry date', 'buy date', 'purchase date'])),
+        exitDate: this.parseDate(getFieldValue('exitDate', ['exit date', 'sell date', 'close date'])),
+        entryPrice: this.parsePrice(getFieldValue('entryPrice', ['entry price', 'buy price', 'purchase price'])),
+        exitPrice: this.parsePrice(getFieldValue('exitPrice', ['exit price', 'sell price', 'close price'])),
+        quantity: this.parseQuantity(getFieldValue('quantity', ['quantity', 'qty', 'shares'])),
+        orderType: getFieldValue('orderType', ['order type', 'type', 'buy sell']) || 'Buy',
+        strategy: getFieldValue('strategy', ['strategy', 'method', 'approach']) || 'Imported Strategy',
+        account: getFieldValue('account', ['account', 'broker', 'platform']) || 'Imported Account',
+        stopLoss: null,
+        target: null
+    };
+    
+    console.log(`🔄 Row ${rowIndex} extracted:`, {
+        symbol: trade.symbol,
+        entryPrice: trade.entryPrice,
+        quantity: trade.quantity,
+        strategy: trade.strategy
+    });
+    
+    return trade;
 }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-/* Animations */
-.fade-in {
-    animation: fadeIn 0.5s ease-in;
-}
-
-.slide-up {
-    animation: slideUp 0.3s ease-out;
-}
-
-@keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Utility Classes */
-.text-center { text-align: center; }
-.text-right { text-align: right; }
-.mb-1 { margin-bottom: 0.5rem; }
-.mb-2 { margin-bottom: 1rem; }
-.mb-3 { margin-bottom: 1.5rem; }
-.mt-1 { margin-top: 0.5rem; }
-.mt-2 { margin-top: 1rem; }
-.mt-3 { margin-top: 1.5rem; }
-
-.hidden { display: none !important; }
-.visible { display: block !important; }
-
-/* Print Styles */
-@media print {
-    .nav-tabs,
-    .trade-controls,
-    .analytics-filters {
-        display: none;
+parseCSVLine(line) {
+    const result = [];
+    let current = '';
+    let inQuotes = false;
+    let i = 0;
+    
+    while (i < line.length) {
+        const char = line[i];
+        const nextChar = line[i + 1];
+        
+        if (char === '"') {
+            if (inQuotes && nextChar === '"') {
+                // Handle escaped quotes
+                current += '"';
+                i += 2;
+                continue;
+            } else {
+                // Toggle quote state
+                inQuotes = !inQuotes;
+                i++;
+                continue;
+            }
+        }
+        
+        if (char === ',' && !inQuotes) {
+            // End of field
+            result.push(current.trim());
+            current = '';
+            i++;
+            continue;
+        }
+        
+        // Regular character
+        current += char;
+        i++;
     }
     
-    .card {
-        box-shadow: none;
-        border: 1px solid #ccc;
-        page-break-inside: avoid;
+    // Add the last field
+    result.push(current.trim());
+    
+    // Clean up each field
+    return result.map(field => {
+        return field
+            .replace(/^["']|["']$/g, '') // Remove surrounding quotes
+            .replace(/""/g, '"') // Unescape quotes
+            .trim();
+    });
+}
+
+parsePrice(priceStr) {
+    if (!priceStr || priceStr === '' || priceStr === '-') return null;
+    
+    // Handle various price formats
+    let cleaned = String(priceStr)
+        .replace(/[\\s"']/g, '') // Remove spaces and quotes
+        .replace(/,/g, '') // Remove Indian comma separators
+        .replace(/[^\\d.-]/g, ''); // Keep only digits, decimal point, and minus
+    
+    const parsed = parseFloat(cleaned);
+    const result = isNaN(parsed) ? null : parsed;
+    
+    console.log(`💰 Price parsing: "${priceStr}" -> "${cleaned}" -> ${result}`);
+    return result;
+}
+
+parseQuantity(qtyStr) {
+    if (!qtyStr || qtyStr === '' || qtyStr === '-') return 1;
+    
+    let cleaned = String(qtyStr)
+        .replace(/[\\s"',]/g, '') // Remove spaces, quotes, commas
+        .replace(/[^\\d]/g, ''); // Keep only digits
+    
+    const parsed = parseInt(cleaned);
+    const result = isNaN(parsed) || parsed <= 0 ? 1 : parsed;
+    
+    console.log(`📊 Quantity parsing: "${qtyStr}" -> "${cleaned}" -> ${result}`);
+    return result;
+}
+
+parseDate(dateStr) {
+    if (!dateStr || dateStr === '' || dateStr === '-') return '';
+    
+    const cleanStr = String(dateStr).trim().replace(/[\\s"']/g, '');
+    console.log(`📅 Date parsing: "${dateStr}" -> "${cleanStr}"`);
+    
+    // Handle various date formats
+    const formats = [
+        // MM/DD/YYYY or DD/MM/YYYY
+        /^(\\d{1,2})\\/(\\d{1,2})\\/(\\d{4})$/,
+        // MM-DD-YYYY or DD-MM-YYYY  
+        /^(\\d{1,2})-(\\d{1,2})-(\\d{4})$/,
+        // YYYY-MM-DD
+        /^(\\d{4})-(\\d{1,2})-(\\d{1,2})$/,
+        // Handle incomplete years like 6/18/202
+        /^(\\d{1,2})\\/(\\d{1,2})\\/(\\d{3})$/
+    ];
+    
+    for (let i = 0; i < formats.length; i++) {
+        const format = formats[i];
+        const match = cleanStr.match(format);
+        
+        if (match) {
+            let year, month, day;
+            
+            if (i === 2) {
+                // YYYY-MM-DD format
+                [, year, month, day] = match;
+            } else if (i === 3) {
+                // Handle incomplete year (assume 2025)
+                [, month, day] = match;
+                year = '2025';
+            } else {
+                // MM/DD/YYYY or DD/MM/YYYY format
+                [, month, day, year] = match;
+                
+                // Smart date interpretation (assume DD/MM if day > 12)
+                if (parseInt(month) > 12) {
+                    [month, day] = [day, month];
+                }
+            }
+            
+            const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+            if (!isNaN(date.getTime()) && date.getFullYear() > 1900) {
+                const result = date.toISOString().split('T')[0];
+                console.log(`✅ Date parsed successfully: ${result}`);
+                return result;
+            }
+        }
     }
     
-    .charts-grid {
-        grid-template-columns: 1fr;
+    // If no format matches, try JavaScript's Date constructor
+    try {
+        const date = new Date(cleanStr);
+        if (!isNaN(date.getTime()) && date.getFullYear() > 1900) {
+            const result = date.toISOString().split('T')[0];
+            console.log(`✅ Date parsed with JS Date: ${result}`);
+            return result;
+        }
+    } catch (e) {
+        console.warn(`⚠️ Date parsing failed: ${cleanStr}`);
     }
-}"""
+    
+    console.warn(`⚠️ Could not parse date: "${dateStr}"`);
+    return '';
+}
 
-# Save CSS file
-with open("style.css", "w", encoding="utf-8") as f:
-    f.write(css_content)
+validateTradeData(trade) {
+    const isValid = (
+        trade.symbol && 
+        trade.symbol.length > 0 &&
+        trade.entryDate &&
+        trade.entryPrice !== null &&
+        trade.entryPrice > 0 &&
+        trade.quantity > 0 &&
+        trade.strategy &&
+        trade.account
+    );
+    
+    if (!isValid) {
+        console.warn('❌ Trade validation failed:', {
+            hasSymbol: !!trade.symbol,
+            hasEntryDate: !!trade.entryDate,
+            hasValidEntryPrice: trade.entryPrice !== null && trade.entryPrice > 0,
+            hasValidQuantity: trade.quantity > 0,
+            hasStrategy: !!trade.strategy,
+            hasAccount: !!trade.account
+        });
+    }
+    
+    return isValid;
+}
+'''
 
-print("✅ style.css created successfully")
+print("🚀 Enhanced CSV Parser Created with:")
+print("✅ Robust quoted field handling")
+print("✅ Flexible header mapping with fallbacks") 
+print("✅ Enhanced number parsing for Indian format")
+print("✅ Multi-format date parsing")
+print("✅ Field validation and error recovery")
+print("✅ Detailed logging for debugging")
+print("✅ Smart column matching logic")
